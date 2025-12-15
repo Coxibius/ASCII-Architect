@@ -20,206 +20,258 @@ class AutoRouter:
         # Initial canvas, will be resized dynamically
         self.paper = Canvas(width=1, height=1) 
         
+    def _get_anchors(self, shape_type, x, y, w, h):
+        """
+        Calculates Smart Anchors (N, S, E, W) based on shape type and dimensions.
+        Returns dict: {'n': (x,y), 's': (x,y), 'e': (x,y), 'w': (x,y)}
+        """
+        cx = x + w // 2
+        cy = y + h // 2
+        
+        anchors = {
+            'n': (cx, y),
+            's': (cx, y + h - 1),
+            'w': (x, cy),
+            'e': (x + w - 1, cy) # Default, works for BOX/CYLINDER
+        }
+
+        # Specific adjustments
+        if shape_type == "DIAMOND":
+            anchors['n'] = (cx, y)
+            anchors['s'] = (cx, y + h - 1)
+            anchors['w'] = (x, cy) # Left Tip
+            anchors['e'] = (x + w - 1, cy) # Right Tip - Exact center horizontally
+            
+        return anchors
+
+    def _draw_vertical_arrow(self, start, end):
+        """
+        Draws a vertical arrow from start(x,y) to end(x,y).
+        Uses geometric routing (Manhattan/Elbow) if not aligned.
+        """
+        sx, sy = start
+        ex, ey = end
+        
+        # 1. Simple Case: Straight down
+        if sx == ex:
+            # Draw line
+            for y in range(sy + 1, ey):
+                self.paper.put_char(sx, y, "|")
+            # Draw Tip
+            self.paper.put_char(ex, ey, "v")
+            # Correct intersection with start line?
+            # Typically start is the bottom of a box, so sy+1 is the first empty space.
+            return
+
+        # 2. Offset Case: Elbow Routing
+        # Start -> Down to Mid -> Horizontal -> Down to End
+        mid_y = sy + (ey - sy) // 2
+        
+        # Down to Mid
+        for y in range(sy + 1, mid_y):
+            self.paper.put_char(sx, y, "|")
+            
+        # Corner 1
+        self.paper.put_char(sx, mid_y, "+")
+        
+        # Horizontal
+        step = 1 if ex > sx else -1
+        # range doesn't include stop, so for reverse we need to be careful
+        # simpler to just iterate min to max
+        start_x_h = min(sx, ex) + 1
+        end_x_h = max(sx, ex)
+        
+        for x in range(start_x_h, end_x_h):
+            self.paper.put_char(x, mid_y, "-")
+            
+        # Corner 2
+        self.paper.put_char(ex, mid_y, "+")
+        
+        # Down to End
+        for y in range(mid_y + 1, ey):
+            self.paper.put_char(ex, y, "|")
+            
+        # Tip
+        self.paper.put_char(ex, ey, "v")
+
     def draw_flow(self, flow_string):
         """
-        Matrix Layout Engine V1.0
+        Matrix Layout Engine V1.1
         Parses input string into a grid of nodes and stamps them onto the canvas.
         Input: "A -> B ; C -> D"
-        Visual:
-          [A]--->[B]
-           |      |
-          v      v (Vertical arrows not implemented yet, just grid structure)
-          [C]--->[D]
         """
         print(f"🔄 Processing Flow: {flow_string}")
         
         # 1. Parsing into Grid
         rows_str = flow_string.split(";")
-        grid = []
-        for r_idx, row_str in enumerate(rows_str):
+        grid_data = [] # List of lists of strings
+        for row_str in rows_str:
             col_nodes = [n.strip() for n in row_str.split("->") if n.strip()]
             if col_nodes:
-                grid.append(col_nodes)
+                grid_data.append(col_nodes)
         
-        if not grid:
+        if not grid_data:
             return ""
 
-        # 2. Grid Dimensions calculation
-        num_rows = len(grid)
-        num_cols = max(len(row) for row in grid)
+        num_rows = len(grid_data)
+        num_cols = max(len(row) for row in grid_data)
         
-        # Stores calculated dimensions for the grid structure
-        # col_widths[c] = max width found in column c
-        # row_heights[r] = max height found in row r (usually fixed for now, but good for future proofing)
+        # 2. Generate & Measure Nodes
+        # node_map[(r,c)] = { 'art': str, 'w': int, 'h': int, 'type': str }
+        node_map = {}
         col_widths = [0] * num_cols
-        row_heights = [0] * num_rows
-        
-        # Pre-calculate node boxes to measure them
-        # node_cache[(r, c)] = (raw_box, width, height)
-        node_cache = {}
+        row_heights = [0] * num_rows # Track max height per row
         
         print("   Calculating Grid Layout...")
+        
         for r in range(num_rows):
-            # Default height for a row if no content (unlikely)
-            current_row_max_h = 5 
+            current_row_max_h = 5 # Min default
             
-            for c in range(len(grid[r])):
-                node_text = grid[r][c]
+            for c in range(len(grid_data[r])):
+                node_text = grid_data[r][c]
                 
-                # Logic to generate box and measure it
-                # Min width 12, or text legnth + 4 padding
+                # Heuristic for Width
                 width = max(12, len(node_text) + 4)
                 dims = f"[DIM:{width}x5]"
                 
-                # Keyword Detection for V2 Models
+                # Type Detection
                 u_text = node_text.upper()
-                shape_type = "BOX" 
+                shape_type = "BOX"
+                if any(x in u_text for x in ["DB", "DATA", "SQL"]): shape_type = "CYLINDER"
+                elif any(x in u_text for x in ["?", "IF", "DECISION"]): shape_type = "DIAMOND"
+                elif any(x in u_text for x in ["START", "END", "USER"]): shape_type = "SOFTBOX"
                 
-                if any(x in u_text for x in ["DB", "DATA", "SQL"]):
-                    shape_type = "CYLINDER"
-                elif any(x in u_text for x in ["?", "IF", "DECISION"]):
-                    shape_type = "DIAMOND" 
-                elif any(x in u_text for x in ["START", "END", "USER"]):
-                    shape_type = "SOFTBOX"
-                
-                # Generate box
-                print(f"   Generating {shape_type} for '{node_text}'...")
+                # Generate
+                # print(f"   Generating {shape_type} for '{node_text}'...") # Reduce noise
                 raw_box = self.brain.generate(shape_type, "[STYLE:SOLID]", dims)
                 final_box = inject_text(raw_box, node_text)
                 
-                # Store in cache
-                node_cache[(r, c)] = final_box
+                # Measure exact
+                lines = final_box.split('\n')
+                real_h = len(lines)
+                real_w = max(len(l) for l in lines) if lines else width
                 
-                # Update Grid Stats
-                if width > col_widths[c]:
-                    col_widths[c] = width
+                node_map[(r,c)] = {
+                    'art': final_box,
+                    'w': real_w,
+                    'h': real_h,
+                    'type': shape_type,
+                    'label': node_text
+                }
                 
-                # Assuming constant height 5 for V1 boxes, but logic supports variable
-                # If we had taller boxes, we'd parse newlines in final_box
-                if 5 > current_row_max_h:
-                    current_row_max_h = 5
+                if real_w > col_widths[c]: col_widths[c] = real_w
+                if real_h > current_row_max_h: current_row_max_h = real_h
             
             row_heights[r] = current_row_max_h
 
-        # 3. Calculate Layout Coordinates (X, Y)
-        # col_coords[0] -> X position of column 0
-        col_coords = []
-        current_x = 2 # Initial Padding Left
-        gap_x = 4      # Space between columns (for short arrows)
+        # 3. Coordinate Calculation
+        # col_x_coords[c] = absolute X
+        col_x_coords = []
+        current_x = 2
+        GAP_X = 6 # Space for horizontal arrows
         
         for w in col_widths:
-            col_coords.append(current_x)
-            current_x += w + gap_x
+            col_x_coords.append(current_x)
+            current_x += w + GAP_X
             
-        # row_coords[0] -> Y position of row 0
-        row_coords = []
-        current_y = 2 # Initial Padding Top
-        gap_y = 3     # Space between rows
+        row_y_coords = []
+        current_y = 2
+        GAP_Y = 4 # Space for vertical arrows
         
         for h in row_heights:
-            row_coords.append(current_y)
-            current_y += h + gap_y
-
-        # 4. Canvas Resizing
-        total_width = current_x + 2 # Padding Right
-        total_height = current_y + 2 # Padding Bottom
-        
+            row_y_coords.append(current_y)
+            current_y += h + GAP_Y
+            
+        # 4. Canvas Resize
+        total_width = current_x + 5
+        total_height = current_y + 5
         print(f"   Resizing Canvas to {total_width}x{total_height}...")
         self.paper = Canvas(width=total_width, height=total_height)
         
-        # 5. Rendering Loop
+        # 5. Rendering & Anchors
+        # First pass: Stamp Nodes and Store Anchors
+        node_positions = {} # (r,c) -> { 'anchors': ... }
+        
         for r in range(num_rows):
-            for c in range(len(grid[r])):
-                # Stamp the Node
-                if (r, c) in node_cache:
-                    box_art = node_cache[(r, c)]
-                    self.paper.stamp(col_coords[c], row_coords[r], box_art)
+            for c in range(len(grid_data[r])):
+                if (r,c) in node_map:
+                    node = node_map[(r,c)]
                     
-                    # Draw Horizontal Arrow (if not last in its row)
-                    if c < len(grid[r]) - 1:
-                        # Determine start and end points for arrow
-                        start_x_node = col_coords[c]
-                        # We need the actual width of THIS node to know where it ends
-                        # But visually, we are aligning columns, so the arrow might stretch?
-                        # Or should the arrow just be between the columns?
+                    # Position: Center in Grid Cell vs Left Align?
+                    # Current: Left Align in Column
+                    x = col_x_coords[c]
+                    y = row_y_coords[r]
+                    
+                    # Optional: Center vertically in row if row height > node height
+                    # y += (row_heights[r] - node['h']) // 2 
+                    
+                    self.paper.stamp(x, y, node['art'])
+                    
+                    # Calculate Anchors
+                    anchors = self._get_anchors(node['type'], x, y, node['w'], node['h'])
+                    node_positions[(r,c)] = anchors
+        
+        # Second pass: Draw Arrows
+        for r in range(num_rows):
+            cols = len(grid_data[r])
+            for c in range(cols):
+                curr_anchors = node_positions.get((r,c))
+                if not curr_anchors: continue
+                
+                # A. Horizontal Arrow (Right Neighbor)
+                if c < cols - 1:
+                    next_anchors = node_positions.get((r, c+1))
+                    if next_anchors:
+                        # Draw ->
+                        start = curr_anchors['e'] # (x,y)
+                        end = next_anchors['w']   # (x,y)
                         
-                        # Requirement: "Calculate x and y px positions based on MAX width"
-                        # This implies columns are fixed width blocks.
-                        # So the arrow starts after the column width? 
-                        # Or does it start after the node?
-                        # "Grid Layout" usually implies alignment.
-                        # Let's anchor arrows to the grid column boundaries for clean alignment.
+                        # Logic: Draw line from start.x to end.x at start.y (assuming aligned centers for now)
+                        # If diamonds are centered differently, y might mismatch.
                         
-                        # Arrow logic:
-                        # Start: col_coords[c] + col_widths[c]
-                        # End: col_coords[c+1] 
-                        # Let's just put a standard arrow right after CURRENT node width?
-                        # No, if we want grid alignment, visually it looks better if arrows are consistent.
-                        # BUT, if node is small in a big column, arrow will float.
-                        # Let's stick to simple: Arrow connects visual right edge of node to next element.
+                        sy = start[1]
                         
-                        # Re-eval for V1:
-                        # Stamp arrow at End of current Node Box?
-                        # Or fixed relative to Grid?
+                        # Simple straight line if Ys approx match
+                        for lx in range(start[0] + 1, end[0]):
+                             self.paper.put_char(lx, sy, "-")
+                        self.paper.put_char(end[0] - 1 if end[0]>start[0] else end[0], sy, ">" if end[0]>start[0] else "<")
+
+                # B. Vertical Arrow (Bottom Neighbor)
+                # Look for node at grid[r+1][c]
+                if r < num_rows - 1:
+                    if c < len(grid_data[r+1]) and (r+1, c) in node_positions:
+                        next_anchors = node_positions[(r+1, c)]
                         
-                        # Let's try: Arrow starts at end of Node Box.
-                        # Problems: If Node A is short, and Node B (below it) is long,
-                        # Column 2 starts at the same X. 
-                        # So Arrow from A needs to be longer to reach Column 2.
+                        start = curr_anchors['s']
+                        end = next_anchors['n']
                         
-                        box_lines = box_art.split('\n')
-                        box_actual_width = len(box_lines[0]) if box_lines else col_widths[c]
-                        
-                        arrow_start_x = col_coords[c] + box_actual_width - 1
-                        arrow_target_x = col_coords[c+1]
-                        
-                        dist = arrow_target_x - arrow_start_x
-                        if dist < 2: dist = 2 # Safety min len
-                        
-                        # Generate dynamic length arrow??
-                        # For now, just a fixed small arrow or whatever fits.
-                        # User said: "For now, keep arrows simple (Horizontal only within same row)"
-                        # Let's use a simple arrow generation logic or fixed.
-                        
-                        arrow_len = dist
-                        # Note: Our arrow generator might support variable length?
-                        # "raw_arrow = self.brain.generate("ARROW", ... f"[LEN:{arrow_len}]")"
-                        # The old code used this. Let's assume engine supports LEN param dynamically or we mock it.
-                        
-                        raw_arrow = self.brain.generate("ARROW", "[DIR:RIGHT]", f"[LEN:{arrow_len}]")
-                        
-                        # Centering Y
-                        # Box is height 5. Center is +2.
-                        arrow_y = row_coords[r] + 2
-                        
-                        self.paper.stamp(arrow_start_x, arrow_y, raw_arrow)
+                        self._draw_vertical_arrow(start, end)
 
         return self.paper.render()
 
 if __name__ == "__main__":
     router = AutoRouter()
     
-    print("\n🏗️ MATRIX LAYOUT TEST V1.0...")
-
-    # TEST 1: Simple 2x2 Grid
-    #  USER -> API
-    #   |?(virtual)
-    #  DB   -> CACHE
-    flow1 = "USER -> API ; DB -> CACHE"
-    print(f"\n[TEST 1: 2x2 Grid]\nPrompt: '{flow1}'")
-    print("-" * 60)
-    print(router.draw_flow(flow1).replace("░", " "))
+    print("\n🏗️ ROUTER REFACTOR TEST...")
     
-    # TEST 2: Uneven Columns
-    #  LONG_NAME_SERVICE -> B
-    #  A                 -> C
-    flow2 = "LONG_NAME_SERVICE -> B ; A -> C"
-    print(f"\n[TEST 2: Alignment Check]\nPrompt: '{flow2}'")
-    print("-" * 60)
-    print(router.draw_flow(flow2).replace("░", " "))
+    # TEST 1: Diamond Anchors
+    # A -> IF -> B
+    print("\n[TEST 1: Diamond Anchors]")
+    t1 = "Start -> Is_Ready? -> Process"
+    print(router.draw_flow(t1).replace("░", " "))
+    
+    # TEST 2: Vertical Internal
+    # Top
+    # |
+    # Bottom
+    print("\n[TEST 2: Vertical Routing]")
+    t2 = "Top_Node ; Bottom_Node"
+    print(router.draw_flow(t2).replace("░", " "))
 
-    # TEST 3: 1D Fallback
-    flow3 = "JUST -> ONE -> LINE"
-    print(f"\n[TEST 3: Standard Linear]\nPrompt: '{flow3}'")
-    print("-" * 60)
-    print(router.draw_flow(flow3).replace("░", " "))
+    # TEST 3: Misalignment (ZigZag)
+    # Long________Node
+    # |
+    # Small
+    print("\n[TEST 3: Layout Alignment]")
+    t3 = "Long_Node_Here ; Small"
+    print(router.draw_flow(t3).replace("░", " "))

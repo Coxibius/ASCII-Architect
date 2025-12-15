@@ -64,12 +64,6 @@ ascii-architect/models/ASCII_Architect_V2_Expansion/
 ```
 Your folder structure must look like this:
 ```text
-
-code
-Text
-download
-content_copy
-expand_less
 models/
 ├── ASCII_Architect_V1_Models/   (Base models)
 └── ASCII_Architect_V2_Expansion/
@@ -142,3 +136,4 @@ v2.0: "Manhattan" Elbow routing (complex paths around obstacles).
 📄 License
 
 MIT License. Created by Coxibius.
+

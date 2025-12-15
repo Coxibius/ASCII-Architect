@@ -71,8 +71,20 @@ class AutoRouter:
                 width = max(12, len(node_text) + 4)
                 dims = f"[DIM:{width}x5]"
                 
+                # Keyword Detection for V2 Models
+                u_text = node_text.upper()
+                shape_type = "BOX" 
+                
+                if any(x in u_text for x in ["DB", "DATA", "SQL"]):
+                    shape_type = "CYLINDER"
+                elif any(x in u_text for x in ["?", "IF", "DECISION"]):
+                    shape_type = "DIAMOND" 
+                elif any(x in u_text for x in ["START", "END", "USER"]):
+                    shape_type = "SOFTBOX"
+                
                 # Generate box
-                raw_box = self.brain.generate("BOX", "[STYLE:SOLID]", dims)
+                print(f"   Generating {shape_type} for '{node_text}'...")
+                raw_box = self.brain.generate(shape_type, "[STYLE:SOLID]", dims)
                 final_box = inject_text(raw_box, node_text)
                 
                 # Store in cache

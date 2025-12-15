@@ -13,30 +13,42 @@ class ArchitectEngine:  # <--- ¡ESTA ES LA CLASE QUE FALTA!
         current_script_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(current_script_dir)
         
-        # Ruta a la carpeta de modelos descomprimida
-        self.models_base_path = os.path.join(project_root, "models", "ASCII_Architect_V1_Models")
+        # Rutas Base
+        self.models_v1_path = os.path.join(project_root, "models", "ASCII_Architect_V1_Models")
+        self.models_v2_path = os.path.join(project_root, "models", "ASCII_Architect_V2_Expansion")
         
-        # Auto-corrección de rutas (por si el zip creó subcarpetas)
-        if not os.path.exists(os.path.join(self.models_base_path, "expert_box")):
-            # Intento: ¿Quizás está dentro de una subcarpeta con el mismo nombre?
-            alt_path = os.path.join(self.models_base_path, "ASCII_Architect_V1_Models")
-            if os.path.exists(os.path.join(alt_path, "expert_box")):
-                self.models_base_path = alt_path
-
-        if not os.path.exists(self.models_base_path):
-            print(f"❌ ERROR: No encuentro modelos en {self.models_base_path}")
+        # Check existencia
+        self.v1_ready = os.path.exists(self.models_v1_path)
+        self.v2_ready = os.path.exists(self.models_v2_path)
+        
+        if not self.v1_ready and not self.v2_ready:
+             print(f"❌ ERROR: No se encontraron modelos en {self.models_v1_path} ni en {self.models_v2_path}")
         else:
-            print(f"✅ MOTOR ARQUITECTO ONLINE. Modelos en: {self.models_base_path}")
-        
+             print(f"✅ MOTOR ARQUITECTO ONLINE.")
+             if self.v1_ready: print(f"   - V1 Models: ACTIVE")
+             if self.v2_ready: print(f"   - V2 Models: ACTIVE")
+
         self.device = "cpu"
 
     def generate(self, expert_type, tags, metadata):
         # Mapeo: BOX -> expert_box
         folder_name = f"expert_{expert_type.lower()}"
-        model_path = os.path.join(self.models_base_path, folder_name)
         
-        if not os.path.exists(model_path):
-            return f"❌ Error: No existe la carpeta {folder_name}"
+        # Lógica de búsqueda de modelo: Prioridad V2 > V1
+        model_path = None
+        
+        if self.v2_ready:
+            candidate = os.path.join(self.models_v2_path, folder_name)
+            if os.path.exists(candidate):
+                model_path = candidate
+        
+        if not model_path and self.v1_ready:
+            candidate = os.path.join(self.models_v1_path, folder_name)
+            if os.path.exists(candidate):
+                model_path = candidate
+                
+        if not model_path or not os.path.exists(model_path):
+            return f"❌ Error: No existe el modelo {folder_name}"
 
         try:
             tokenizer = GPT2Tokenizer.from_pretrained(model_path, local_files_only=True)

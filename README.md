@@ -9,10 +9,7 @@
  / ___ \ ___) | |___ | | | |   / ___ \| |  | | | | | ||  __/ (__| |_ 
 /_/   \_\____/ \____|___|___| /_/   \_\_|  |_| |_|_|\__\___|\___|\__|
                                                        v1.0-beta
-```
-![alt text](https://img.shields.io/badge/License-MIT-yellow.svg)
-![alt text](https://img.shields.io/badge/Python-3.9%2B-blue)
-![alt text](https://img.shields.io/badge/Architecture-Neural--Symbolic-purple)
+
 
 ASCII Architect is an engineering-grade tool designed to generate precision ASCII diagrams directly in your CLI. Unlike standard generative art, this tool prioritizes structural integrity, grid alignment, and semantic logic for software documentation.
 
@@ -246,6 +243,7 @@ v2.0: "Manhattan" Elbow routing (complex paths around obstacles).
 📄 License
 
 MIT License. Created by Coxibius.
+
 
 
 

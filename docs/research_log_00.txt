@@ -1,0 +1,36 @@
+==========================================================
+RESEARCH LOG 01: PROJECT TERMINAL-GOD (ASCII-ARCHITECT)
+Date: December 14, 2025
+Version: V18-Alpha (Engineering Focus)
+Status: ✅ Project Structure Created | ✅ Box Generator Validated
+==========================================================
+
+1. STRATEGIC PIVOT
+------------------
+Following the success of Stickman V17 (Hybrid Architecture), the decision was made to pivot towards an industrial-grade tool: ASCII-Architect. The goal is to provide developers with an engine to generate technical diagrams (Cloud, DB, Git) directly in the terminal.
+
+2. TECHNICAL ARCHITECTURE (V18 STANDARD)
+----------------------------------------
+The "Hybrid Neuro-Symbolic" engine is maintained:
+- Neural: GPT-2 Small (Experts in 2D geometry).
+- Symbolic: Python Orchestrator (Coordinate assembly and Snapping).
+
+New Dictionary Standards:
+- Structural: <Lxx> (Line) and [S:xx] (Horizontal space).
+- Visual: ░ (Transparency/Canvas) and Primitives (+, -, |).
+- Logical (Anchors): N, S, E, W (Cardinal points for arrow connection).
+
+3. DEVELOPMENT STATUS
+---------------------
+- Factory_Boxes.py: COMPLETED. Generates 5,000 dynamic box samples (5x3 to 20x10) with mathematical anchors.
+- Tokenization: Usage of [DIM:WxH] defined so the AI understands scale.
+- Text Logic: Text injection is delegated to the Python Orchestrator to ensure 1:1 typographic precision.
+
+4. NEXT STEPS
+-------------
+- Train Expert_Box (V18) on Kaggle.
+- Develop Factory_Arrows.py (The challenge of diagonals and flow).
+- Implement Canvas.py (The 2D matrix that will allow moving boxes without breaking the ASCII).
+
+"The future of technical documentation is lightweight, fast, and ASCII."
+==========================================================

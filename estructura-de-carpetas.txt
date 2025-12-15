@@ -1,0 +1,40 @@
+ ESTRUCTURA DE CARPETAS (Standard Python Package)
+
+Esta estructura está lista para ser subida a PyPI (pip install ascii-architect).
+
+code
+Text
+download
+content_copy
+expand_less
+ascii-architect/
+│
+├── .github/                   # Workflows para CI/CD (Tests automáticos)
+├── assets/                    # Screenshots para el README
+│
+├── models/                    # Aquí viven los .bin/.safetensors
+│   ├── expert_box/
+│   └── expert_arrow/
+│
+├── src/                       # Código Fuente Puro
+│   └── ascii_architect/
+│       ├── __init__.py        # Versión y exposiciones
+│       ├── cli.py             # Entry point (Typer/Click)
+│       ├── engine.py          # El Orquestador Principal
+│       ├── canvas.py          # Lógica de Matriz 2D (Grid System)
+│       └── utils/
+│           ├── cleaning.py    # Regex de limpieza V17
+│           └── downloader.py  # Script para bajar modelos si no existen
+│
+├── tests/                     # Tests unitarios (PyTest)
+│   ├── test_engine.py
+│   └── test_canvas.py
+│
+├── datasets/                  # Generadores de datos sintéticos
+│   ├── factory_boxes.py       # Genera cajas cuadradas/rectangulares
+│   └── factory_arrows.py      # Genera flechas y líneas
+│
+├── .gitignore
+├── README.md
+├── requirements.txt
+└── setup.py                   # Configuración de instalación

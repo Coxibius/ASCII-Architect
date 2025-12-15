@@ -1,0 +1,175 @@
+Aquí tienes la Especificación Técnica V18 (ASCII-Architect).
+
+1. EL NUEVO DICCIONARIO DE TOKENS
+
+Mantenemos la tecnología Hybrid (Visual + Matemático), pero adaptamos los símbolos al mundo de la ingeniería.
+
+A. Tokens Estructurales (SE QUEDAN IGUAL)
+
+Estos son el núcleo de tu motor. No los toques.
+
+<Lxx>: (Line Index) Vital para mantener la verticalidad.
+
+[S:xx]: (Space Math) Vital para empujar las cajas a la derecha sin deformarlas.
+
+[STOP]: La guillotina.
+
+B. Tokens Visuales (EL CAMBIO DE PIEL)
+
+El Stickman usaba o y (. El Arquitecto usa líneas rectas.
+
+Token V17 (Stickman)	Token V18 (Architect)	Uso
+░ (Alpha)	░	Mismo uso. Relleno/Transparencia.
+§ (Cuello)	N, S	Anchors Verticales (North/South). Puntos de conexión para flechas.
+L, R (Hombros)	W, E	Anchors Horizontales (West/East).
+( ) / \	+ - `	`
+µ (Grip)	> < ^ v	Puntas de Flecha.
+C. Tags de Prompt (NUEVA SEMÁNTICA)
+
+Aquí es donde le damos inteligencia.
+
+Tipos: [TYPE:BOX], [TYPE:ARROW], [TYPE:DB], [TYPE:CLOUD].
+
+Estilos: [STYLE:SOLID] (+---+), [STYLE:DOTTED] (.....), [STYLE:ROUND] ((...)).
+
+Dimensiones (¡NUEVO!): [DIM:10x3], [DIM:15x5].
+
+Nota: Esto es crítico. El modelo debe aprender a dibujar cajas de diferentes anchos.
+
+2. LA LÓGICA DE GENERACIÓN (Factory 2.0)
+
+El Stickman tenía tamaño fijo (5x5). Las cajas de arquitectura varían.
+Necesitamos un script Factory_Boxes.py que genere miles de cajas de diferentes tamaños y estilos.
+
+Aquí te muestro cómo adaptar tu lógica "format_line_hybrid" para este nuevo mundo.
+
+🧠 Script: Factory_Architect_V1.py
+
+(Solo el generador de datos para entrenar al Expert_Box)
+
+code
+Python
+download
+content_copy
+expand_less
+import json
+import random
+
+# CONFIGURACIÓN
+OUTPUT_FILE = "train_boxes.jsonl"
+SAMPLES = 5000
+
+# DICCIONARIO V18
+ALPHA = "░"
+ANCHOR_N = "N"
+ANCHOR_S = "S"
+ANCHOR_E = "E"
+ANCHOR_W = "W"
+BORDER_H = "-"
+BORDER_V = "|"
+CORNER = "+"
+
+def generate_box_art(width, height, style="SOLID"):
+    """
+    Genera una caja ASCII perfecta con anchors lógicos.
+    Ejemplo 5x3:
+    +N--+
+    W░░░E
+    +S--+
+    """
+    art = []
+    
+    # 1. TECHO (Con Anchor Norte)
+    # Calculamos centro para poner la N
+    mid = width // 2
+    top = CORNER + (BORDER_H * (mid - 1)) + ANCHOR_N + (BORDER_H * (width - mid - 2)) + CORNER
+    art.append(top)
+    
+    # 2. CUERPO (Con Anchors Oeste/Este y relleno transparente)
+    # Repetimos según la altura (height - 2 tapas)
+    inner_width = width - 2
+    filler = ALPHA * inner_width # Usamos ░ para el relleno
+    
+    for _ in range(height - 2):
+        # Pared W + Relleno + Pared E
+        # Nota: Ponemos W y E en medio de las paredes verticales
+        row = ANCHOR_W + filler + ANCHOR_E 
+        # (Ojo: En realidad W y E deberían reemplazar al BORDER_V en el centro, 
+        # pero para simplificar el entrenamiento, hagamos que los bordes sean W/E a veces)
+        
+        # Opción más simple para V1: Bordes normales, anchors solo en centros
+        row = BORDER_V + filler + BORDER_V
+        art.append(row)
+        
+    # Inyectamos anchors W/E en la fila central
+    center_row_idx = len(art) // 2
+    # Reconstruimos la fila central con anchors
+    art[center_row_idx] = ANCHOR_W + filler + ANCHOR_E
+
+    # 3. SUELO (Con Anchor Sur)
+    bottom = CORNER + (BORDER_H * (mid - 1)) + ANCHOR_S + (BORDER_H * (width - mid - 2)) + CORNER
+    art.append(bottom)
+    
+    return art
+
+def format_hybrid_v18(line, line_idx):
+    """
+    LA LÓGICA HÍBRIDA ADAPTADA:
+    No necesitamos padding a la derecha porque la caja tiene ancho variable.
+    Solo necesitamos calcular el [S:xx] inicial si queremos moverla.
+    """
+    # Para el entrenamiento, asumimos que la caja empieza en X=0
+    # Así que S es siempre 00. El Orquestador decidirá dónde ponerla (X,Y).
+    s_token = "[S:00]" 
+    l_token = f"<L{line_idx+1:02d}>"
+    
+    return f"{l_token} {s_token} {line}"
+
+# --- GENERADOR PRINCIPAL ---
+with open(OUTPUT_FILE, "w") as f:
+    for _ in range(SAMPLES):
+        # Variamos dimensiones
+        w = random.randint(5, 20) # Ancho entre 5 y 20 caracteres
+        h = random.randint(3, 10) # Alto entre 3 y 10 líneas
+        
+        # Generar arte crudo
+        raw_art = generate_box_art(w, h)
+        
+        # Crear Prompt con metadatos explícitos
+        # El modelo debe aprender a correlacionar [DIM:WxH] con el dibujo
+        prompt = f"[TYPE:BOX] [STYLE:SOLID] [DIM:{w}x{h}]"
+        
+        # Formatear Completion (V15+V17 Logic)
+        comp_lines = [format_hybrid_v18(l, i) for i, l in enumerate(raw_art)]
+        completion = "\n".join(comp_lines) + " [STOP]"
+        
+        f.write(json.dumps({"prompt": prompt, "completion": completion}) + "\n")
+
+print("✅ Dataset de Arquitecto generado.")
+3. EL CAMBIO EN EL ORQUESTADOR (Python Logic)
+
+Cuando tengamos este modelo (Expert_Box), tu orquestador cambiará un poco.
+
+Antes (Stickman):
+
+Ensamblaje vertical ciego (Totem).
+
+Ahora (Architect):
+
+Superposición de Texto: El modelo generará el "cascarón" de la caja lleno de ░. Tu Python tendrá que tomar el texto "Database" y escribirlo encima de los ░.
+
+Conversión de Anchors:
+
+El modelo escupe: +N--+
+
+Tu Python detecta N, guarda la coordenada (x=5, y=0) como punto de conexión, y visualmente reemplaza N por - o + para que se vea bonito.
+
+4. RESUMEN DE LA ADAPTACIÓN
+
+Line Tokens <Lxx>: Se quedan. Son vitales para cajas altas.
+
+Space Tokens [S:xx]: Se quedan, pero en el entrenamiento valdrán 00. En el uso real, el orquestador inyectará [S:15] para mover la caja a la derecha.
+
+Visual ░: Vital. Es el lienzo donde escribiremos el texto luego.
+
+Anchors: Cambian de partes del cuerpo a puntos cardinales (N, S, E, W).

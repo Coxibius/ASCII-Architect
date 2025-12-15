@@ -1,0 +1,78 @@
+=========================================================================
+📘 RESEARCH LOG 01: PROJECT ASCII-ARCHITECT (GENESIS & EVOLUTION)
+Date: December 14, 2025
+Version: V18-Beta (Expansion Phase)
+Status: ✅ Base Experts (Box/Arrow) | 🔄 New Experts Training | 🚧 Advanced Routing Pending
+Previous Context: Evolution from "Stickman V17" to "ASCII-ARCHITECT".
+=========================================================================
+
+1. STRATEGIC PIVOT & EXPANSION
+-------------------------------
+Validation of "Hybrid Neuro-Symbolic" architecture confirmed that "AI is the mason (draws), Python is the architect (measures)."
+We are now expanding beyond simple "Boxes & Arrows" to support full UML/ER capabilities.
+
+2. TECHNICAL ARCHITECTURE (V18+ STANDARD)
+------------------------------------------
+A hybrid token system is standardized ensuring geometric precision.
+
+A. The Dictionary:
+   - Structural: <Lxx> (Line Index) + [S:xx] (Mathematical Spacing).
+   - Visual: ░ (Canvas/Alpha) + +, -, | (Borders).
+   - Logical (Anchors): N, S, E, W (Cardinal points for auto-connection).
+   - Semantic: [TYPE:BOX|DIAMOND|CYLINDER], [STYLE:SOLID], [DIM:WxH], [LEN:x].
+
+B. The Experts (Small Language Models - GPT-2):
+   [Legacy/Stable]
+   1. Expert_Box: Rectangular containers.
+   2. Expert_Arrow: Directional flow lines.
+   
+   [New/In-Training]
+   3. Expert_Diamond: Decision nodes (`/\`) for Flowcharts.
+   4. Expert_Cylinder: Storage nodes (`( )`) for ER Diagrams/Databases.
+
+3. DATA ENGINEERING MILESTONES
+-------------------------------
+A. Synthetic Data Generation (The Factories):
+   - `factory_boxes.py`: 5,000 samples (Done).
+   - `factory_arrows.py`: 5,000 samples (Done).
+   - [NEW] `factory_diamonds.py`: 5,000 samples generated. Rhombic inputs for decisions.
+   - [NEW] `factory_cylinders.py`: 5,000 samples generated. Database shapes with lids.
+
+B. Model Status:
+   - Box & Arrow: deployed and functional (Local Inference).
+   - Diamond & Cylinder: Datasets ready for training. (These replace any previous interim attempts).
+
+4. CURRENT INVENTORY (LOCAL DEPLOYMENT)
+----------------------------------------
+Directory Structure:
+/ASCII-Architect
+    /models/ASCII_Architect_V1_Models/ 
+        /expert_box/   (Active)
+        /expert_arrow/ (Active)
+    /datasets/         
+        dataset_boxes.jsonl
+        dataset_arrows.jsonl
+        dataset_diamonds.jsonl (READY)
+        dataset_cylinders.jsonl (READY)
+    /src/              
+        engine.py      (V18 Inference Engine)
+        router.py      (Linear Routing Logic)
+
+5. IMMEDIATE ROADMAP (PHASE 3: COMPLEX ROUTING)
+-----------------------------------------------
+The "Manhattan Routing" challenge.
+1. The New Experts:
+   - Train `Expert_Diamond` and `Expert_Cylinder` on Kaggle GPUs.
+   
+2. The Manhattan Router:
+   - Upgrade `router.py` to support "Elbows" (L-shapes).
+   - Logic: `ManhattanWalker` to calculate pathfinding between (x1, y1) and (x2, y2).
+   - Strategy: Hybrid approach -> Use generated straight lines + Python-injected corners (`+`).
+
+3. Cardinality:
+   - Post-processing hooks to turn simple arrows (`>`) into Crow's Foot (`----|<`) for ER diagrams.
+
+=========================================================================
+END OF REPORT update.
+"We are moving from connecting blocks to designing systems."
+=========================================================================

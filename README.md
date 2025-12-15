@@ -1,7 +1,7 @@
 🏛️ ASCII Architect
 > **The Neural-Symbolic Diagram Generator for the Terminal.**
 
-```text
+
     _    ____   ____ ___ ___      _         _     _ _            _   
    / \  / ___| / ___|_ _|_ _|    / \   _ __| |__ (_) |_ ___  ___| |_ 
   / _ \ \___ \| |    | | | |    / _ \ | '__| '_ \| | __/ _ \/ __| __|
@@ -103,4 +103,5 @@ v1.5: Dynamic Text Resizing (Auto-expand shapes).
 
 v2.0: "Manhattan" Elbow routing (complex paths around obstacles).
 📄 License
+
 MIT License. Created by Coxibius.

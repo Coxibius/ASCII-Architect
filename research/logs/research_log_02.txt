@@ -1,0 +1,46 @@
+RESEARCH LOG 02: Vertical Routing & Smart Anchors
+Date: 2025-12-15
+Author: Consola / ASCII Architect Team
+
+## 🎯 Objective
+Evolution of the Layout Engine from a 1D linear list to a 2D Grid implementation, specifically addressing semantic connection points ("Smart Anchors") and multi-row routing.
+
+## 🛠️ Changes Implemented
+
+### 1. Router Refactor (`src/router.py`)
+- Transitioned from a simple string concatenation loop to a Grid Projection system.
+- The input string (e.g., "A -> B ; C -> D") is now parsed into a matrix `grid[row][col]`.
+- Dimensions are pre-calculated to align columns based on the widest element in the column (`col_widths`).
+
+### 2. Smart Anchors Implementation
+- **Problem**: Previously, arrows connected to the generic "side" of a text block. For Diamond shapes (Decision nodes), this meant arrows clipped through the diagonal walls.
+- **Solution**: Implemented `_get_anchors(shape_type, ...)` logic.
+  - **BOX / SOFTBOX / CYLINDER**: Anchors are at `(Right_Edge, Center_Y)` and `(Left_Edge, Center_Y)`.
+  - **DIAMOND**: 
+    - **East Anchor**: `(Right_Tip_X, Center_Y)`
+    - **West Anchor**: `(Left_Tip_X, Center_Y)`
+    - **North/South**: Exact horizontal centers.
+  - This ensures that arrows cleanly touch the tips of the rhombus `< >`.
+
+### 3. Vertical Routing Engine
+- Implemented `_draw_vertical_arrow(start, end)` to handle Row-to-Row connections.
+- **Logic**:
+  - **Aligned Nodes**: Draws a straight vertical line `|` capped with `v`.
+  - **Misaligned Nodes (Offsets)**: Implements a "Manhattan/Elbow" strategy:
+    1. Drop down from Start (South Anchor).
+    2. Create a "Jog" or "Dogleg" at the midpoint (`+---...---+`).
+    3. Drop down to target (North Anchor).
+  - This allows nodes of different widths to be connected without visual breaks.
+
+### 4. Layout Stabilization
+- The canvas now auto-sizes based on the calculated grid dimensions.
+- Added variable padding between columns and rows to accommodate arrow heads and turns.
+
+## ✅ Results
+- Successful generation of 2x2 grids.
+- Diamonds now have clean connections.
+- Vertical flows work for both aligned and staggered layouts.
+
+## 🔜 Next Steps
+- Implement "Back-Arrows" (Loops) for true flow control.
+- Improve collision detection for complex Elbow routes (avoid cutting through other nodes).

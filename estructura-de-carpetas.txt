@@ -1,40 +1,104 @@
- ESTRUCTURA DE CARPETAS (Standard Python Package)
+ ═══════════════════════════════════════════════════════════════════════════
+  ESTRUCTURA DE CARPETAS - ASCII ARCHITECT (V18 - Saturn Effect Edition)
+═══════════════════════════════════════════════════════════════════════════
 
-Esta estructura está lista para ser subida a PyPI (pip install ascii-architect).
+Esta estructura documenta el estado actual del proyecto ASCII Architect.
+Última actualización: 2025-12-20
 
-code
-Text
-download
-content_copy
-expand_less
-ascii-architect/
+ASCII-Architect/
 │
-├── .github/                   # Workflows para CI/CD (Tests automáticos)
-├── assets/                    # Screenshots para el README
+├── .github/                          # CI/CD Workflows (Tests automáticos)
 │
-├── models/                    # Aquí viven los .bin/.safetensors
-│   ├── expert_box/
-│   └── expert_arrow/
+├── .venv/                            # Virtual Environment (Python)
 │
-├── src/                       # Código Fuente Puro
-│   └── ascii_architect/
-│       ├── __init__.py        # Versión y exposiciones
-│       ├── cli.py             # Entry point (Typer/Click)
-│       ├── engine.py          # El Orquestador Principal
-│       ├── canvas.py          # Lógica de Matriz 2D (Grid System)
+├── assets/                           # Screenshots y recursos visuales para README
+│
+├── models/                           # Modelos AI (GPT-2 Fine-tuned)
+│   ├── ASCII_Architect_V1_Models/   # V1: expert_box, expert_arrow
+│   ├── ASCII_Architect_V1_Models.zip
+│   ├── ASCII_Architect_V2_Expansion/ # V2: expert_diamond, expert_cylinder, expert_soft_box
+│   └── ASCII_Architect_V2_Models.zip
+│
+├── src/                              # 🔥 CÓDIGO FUENTE PRINCIPAL
+│   ├── engine.py                     # Motor AI (GPT-2 Wrapper)
+│   ├── router.py                     # ⭐ ORQUESTADOR PRINCIPAL (2D Grid + Manhattan Routing)
+│   ├── cli.py                        # CLI con Typer (comandos box/flow)
+│   ├── main.py                       # Entry point alternativo
+│   ├── utils.py                      # Helpers generales
+│   ├── verify_diamond_custom.py      # Script de validación de diamantes
+│   │
+│   └── ascii_architect/              # Paquete Python (para PyPI)
+│       ├── __init__.py
+│       ├── canvas.py                 # Sistema de Grid 2D (stamping)
+│       ├── cli.py                    # (Duplicado para estructura de paquete)
 │       └── utils/
-│           ├── cleaning.py    # Regex de limpieza V17
-│           └── downloader.py  # Script para bajar modelos si no existen
+│           ├── cleaning.py           # Regex de limpieza V17/V18
+│           └── downloader.py         # Auto-descarga de modelos
 │
-├── tests/                     # Tests unitarios (PyTest)
+├── datasets/                         # 📊 GENERADORES DE DATOS SINTÉTICOS
+│   ├── factory_boxes.py              # Genera dataset de cajas
+│   ├── factory_arrows.py             # Genera dataset de flechas
+│   ├── factory_diamonds.py           # Genera dataset de diamantes (rombos)
+│   ├── factory_cylinders.py          # Genera dataset de cilindros (DB)
+│   ├── factory_soft_boxes.py         # Genera dataset de soft boxes (rounded)
+│   │
+│   ├── dataset_boxes.jsonl           # ~1.7 MB (cajas entrenadas)
+│   ├── dataset_arrows.jsonl          # ~660 KB (flechas)
+│   ├── dataset_diamonds.jsonl        # ~4.4 MB (diamantes)
+│   ├── dataset_cylinders.jsonl       # ~2.0 MB (cilindros)
+│   └── dataset_soft_boxes.jsonl      # ~1.7 MB (soft boxes)
+│
+├── scripts/                          # Scripts auxiliares
+│   └── engine.py                     # Motor AI (posible duplicado)
+│
+├── notebooks/                        # 📓 JUPYTER NOTEBOOKS (Experimentación)
+│   ├── ascii-architect-00.ipynb      # Notebook inicial
+│   ├── v1-cuadrados-y-flechas.ipynb  # Entrenamiento V1
+│   ├── v1-rombos-y-cilindros.ipynb   # Entrenamiento V2 (diamantes/cilindros)
+│   └── factory_cylinders-diamods-softboxes.ipynb
+│
+├── docs/                             # 📚 DOCUMENTACIÓN TÉCNICA
+│   ├── research_log_00.txt           # Logs de investigación
+│   ├── research_log_01.txt
+│   └── research_log_02.txt
+│
+├── tests/                            # 🧪 TESTS UNITARIOS (PyTest)
 │   ├── test_engine.py
 │   └── test_canvas.py
 │
-├── datasets/                  # Generadores de datos sintéticos
-│   ├── factory_boxes.py       # Genera cajas cuadradas/rectangulares
-│   └── factory_arrows.py      # Genera flechas y líneas
+├── .gitignore                        # Exclusiones de Git
+├── README.md                         # Documentación principal del proyecto
+├── requirements.txt                  # Dependencias Python
 │
-├── .gitignore
-├── README.md
-├── requirements.txt
-└── setup.py                   # Configuración de instalación
+├── IA-context.md                     # 🧠 CONTEXTO PARA AGENTES AI (CRÍTICO)
+├── ROADMAP.txt                       # Roadmap del proyecto
+├── logica_del_motor.txt              # Documentación de la lógica del motor
+├── estructura-de-carpetas.txt        # [ESTE ARCHIVO]
+│
+└── output.txt                        # Salida de pruebas/demos
+
+═══════════════════════════════════════════════════════════════════════════
+  NOTAS IMPORTANTES
+═══════════════════════════════════════════════════════════════════════════
+
+🎯 ARQUITECTURA ACTUAL (V18):
+   - Motor Híbrido: AI Models (BOX/ARROW/CYLINDER/SOFTBOX) + Procedural (DIAMOND)
+   - Router 2D: Soporte para grids (rows/cols), Manhattan routing con elbows
+   - Saturn Effect: Diamantes procedurales con conos fijos (3 líneas) para texto largo
+
+📦 MODELOS DISPONIBLES:
+   V1: expert_box, expert_arrow
+   V2: expert_diamond, expert_cylinder, expert_soft_box
+
+🔧 ARCHIVOS CLAVE:
+   - src/router.py: Cerebro del layout (2D grid + smart anchors)
+   - src/engine.py: Wrapper de GPT-2 para generación AI
+   - src/ascii_architect/canvas.py: Sistema de stamping en grid 2D
+   - IA-context.md: Fuente de verdad para agentes AI
+
+🚀 PRÓXIMOS PASOS:
+   - Packaging para PyPI (pyproject.toml)
+   - UML avanzado (class diagrams, sequence diagrams)
+   - Notación de cardinalidad para ER diagrams (Crow's Foot)
+
+═══════════════════════════════════════════════════════════════════════════

@@ -41,53 +41,56 @@ Smart Anchors: Arrows calculate exact entry/exit points (e.g., Diamond tips) to 
 Vertical Routing: Automatically draws vertical connections between rows.
 
 ⚡ Quick Start
-1. Clone the Repository
-```Text
+
+### 1. Clone the Repository
+```bash
 git clone https://github.com/Coxibius/ASCII-Architect.git
 cd ASCII-Architect
 ```
-3. Install Dependencies
-```Text
-pip install -r requirements.txt
+
+### 2. Install the Package
+Instala la herramienta y sus dependencias de forma global o en tu entorno virtual:
+```bash
+pip install .
 ```
-3. 📥 Download the Brains (Models)
+> [!NOTE]
+> Esto registrará el comando `ascii-arch` en tu sistema.
 
-Since the neural weights are heavy, they are hosted in the Releases section.
+### 3. 📥 Download the Brains (Models)
+*Opcional: Solo necesario para el modo Neural.*
 
-Go to the Releases Page.
-
-Download ASCII_Architect_V2_Expansion.zip.
-
-Extract them exactly into:
-```Text
-ascii-architect/models/ASCII_Architect_V2_Expansion/
-```
-Your folder structure must look like this:
-```text
-models/
-├── ASCII_Architect_V1_Models/   (Base models)
-└── ASCII_Architect_V2_Expansion/
-    ├── expert_cylinder/
-    ├── expert_diamond/
-    └── expert_softbox/
-```
+Puesto que los pesos de los modelos son pesados, se alojan en la sección de Releases.
+1. Ve a la [Releases Page](https://github.com/Coxibius/ASCII-Architect/releases).
+2. Descarga `ASCII_Architect_V2_Expansion.zip`.
+3. Extráelo exactamente en: `models/ASCII_Architect_V2_Expansion/`.
 
 🎮 Usage
 
-Run the CLI directly from the source:
+Tras la instalación, puedes usar el comando global `ascii-arch`.
 
-Basic Horizontal Flow
-```Text
-python src/cli.py flow "CLIENT -> API_GATEWAY -> SERVER"
+### Basic Horizontal Flow
+```bash
+ascii-arch flow "CLIENT -> API_GATEWAY -> SERVER"
 ```
-🚀 Advanced Matrix Flow (The "Architecture" Mode)
 
-Use ; to break lines. The engine will align columns automatically.
-```Text
-python src/cli.py flow "USER -> LOGIN_API -> AUTH_SERVICE ; IS_LOGGED? -> USER_DB ; ERROR_PAGE"
+### 🕵️ Auto-Discovery (Scan)
+Analiza automáticamente la estructura de tu proyecto y genera un diagrama:
+```bash
+# Analiza la raíz con profundidad 1 (por defecto)
+ascii-arch scan .
+
+# Analiza con mayor profundidad
+ascii-arch scan . --depth 2
 ```
+
+### 🚀 Advanced Matrix Flow
+Usa `;` para saltos de línea y el flag `--neural` (o `-n`) para usar la IA:
+```bash
+ascii-arch flow "USER -> LOGIN_API -> AUTH_SERVICE ; IS_LOGGED? -> USER_DB ; ERROR_PAGE" --neural
+```
+
 Output Preview:
-```Text
+```text
   .----------.        +-----------+      +--------------+
   |          |        |           |      |              |
   |   USER   |------->| LOGIN_API |----->| AUTH_SERVICE |

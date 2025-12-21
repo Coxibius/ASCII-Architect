@@ -3,32 +3,37 @@ import re
 import sys
 import torch
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
+from pathlib import Path
 
-# Configuración de consola para Windows
-sys.stdout.reconfigure(encoding='utf-8')
+# Detectar dónde está instalado el archivo y buscar modelos relativos
+BASE_DIR = Path(__file__).resolve().parent.parent.parent # Sube de src/ascii_architect/ a root/
+# PRIORIDAD: Carpeta research/models (Entorno de desarrollo)
+# FALLBACK: Carpeta models/ (Directorio raíz estándar)
+DEFAULT_MODELS_V2 = BASE_DIR / "research" / "models" / "ASCII_Architect_V2_Expansion"
+DEFAULT_MODELS_V1 = BASE_DIR / "models" / "ASCII_Architect_V1_Models"
 
-class ArchitectEngine:  # <--- ¡ESTA ES LA CLASE QUE FALTA!
+class ArchitectEngine:
     def __init__(self):
         # 1. LOCALIZADOR DE MODELOS
-        current_script_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.dirname(current_script_dir)
-        
-        # Rutas Base
-        self.models_v1_path = os.path.join(project_root, "models", "ASCII_Architect_V1_Models")
-        self.models_v2_path = os.path.join(project_root, "models", "ASCII_Architect_V2_Expansion")
+        # Buscamos en variables de entorno o usamos los paths por defecto
+        self.models_v2_path = os.getenv("ASCII_ARCH_MODELS_V2", str(DEFAULT_MODELS_V2))
+        self.models_v1_path = os.getenv("ASCII_ARCH_MODELS_V1", str(DEFAULT_MODELS_V1))
         
         # Check existencia
-        self.v1_ready = os.path.exists(self.models_v1_path)
         self.v2_ready = os.path.exists(self.models_v2_path)
+        self.v1_ready = os.path.exists(self.models_v1_path)
         
         if not self.v1_ready and not self.v2_ready:
-             print(f"❌ ERROR: No se encontraron modelos en {self.models_v1_path} ni en {self.models_v2_path}")
+             # Lanzamos información pero no bloqueamos (el Router manejará el fallback)
+             print(f"⚠️ [WARNING] No se encontraron modelos en:")
+             print(f"   V2: {self.models_v2_path}")
+             print(f"   V1: {self.models_v1_path}")
         else:
              print(f"✅ MOTOR ARQUITECTO ONLINE.")
-             if self.v1_ready: print(f"   - V1 Models: ACTIVE")
              if self.v2_ready: print(f"   - V2 Models: ACTIVE")
+             if self.v1_ready: print(f"   - V1 Models: ACTIVE (Legacy Fallback)")
 
-        self.device = "cpu"
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
     def generate(self, expert_type, tags, metadata):
         # Mapeo: BOX -> expert_box

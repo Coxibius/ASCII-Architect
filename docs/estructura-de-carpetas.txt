@@ -1,0 +1,29 @@
+  ═══════════════════════════════════════════════════════════════════════════
+   ESTRUCTURA DE CARPETAS - ASCII ARCHITECT (v1.0.0)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  ASCII-Architect/
+  ├── docs/                             # 📚 Documentación técnica y Roadmap
+  │   ├── IA-context.md                 # Fuente de verdad para agentes AI
+  │   ├── ROADMAP.txt                   # Estado del desarrollo
+  │   └── estructura-de-carpetas.txt    # [ESTE ARCHIVO]
+  │
+  ├── research/                         # 🔬 Investigación y Entrenamiento
+  │   ├── models/                       # Pesos de modelos GPT-2
+  │   ├── notebooks/                    # Logs de entrenamiento
+  │   └── datasets/                     # Datos sintéticos (JSONL)
+  │
+  ├── src/                              # 🛠️ Código Fuente (Paquete)
+  │   └── ascii_architect/
+  │       ├── cli.py                    # Interfaz Typer
+  │       ├── router.py                 # Orquestador Principal
+  │       ├── renderers.py              # Plantillas Deterministas
+  │       ├── neural_engine.py          # Bridge de IA
+  │       ├── scanner.py                # Analizador de Proyectos
+  │       ├── canvas.py                 # Grid 2D
+  │       └── utils/                    # Utilerías unificadas
+  │
+  ├── pyproject.toml                    # Configuración de empaquetado
+  ├── requirements.txt                  # Dependencias base
+  ├── README.md                         # Guía de usuario
+  └── .gitignore                        # Exclusiones

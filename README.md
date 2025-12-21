@@ -26,6 +26,15 @@ It uses a Hybrid Architecture:
 
 Matrix / Grid Layout: Use ; to define rows and -> for columns.
 
+### 📑 Semantic Cheat Sheet (Keyword-to-Shape)
+
+| Keyword / Context | Shape Type | Visual Meaning |
+| :--- | :--- | :--- |
+| `DB`, `DATA`, `SQL`, `SQLITE` | **CYLINDER** | Database / Storage |
+| `?`, `IF`, `DECISION` | **DIAMOND** | Decision Node (Saturn Effect) |
+| `USER`, `CLIENT`, `AUTH`, `[DIR]` | **SOFTBOX** | Human Actor / Entry Point / Folder |
+| `PROCESS`, `API`, `DEFAULT` | **BOX** | Standard Operation / Task |
+
 Semantic Shape Detection: The engine automatically selects the right shape based on your text:
 
 DB, DATA, SQL → Cylinder (Database)

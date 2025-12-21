@@ -1,0 +1,19 @@
+🚀 ROADMAP: ASCII-ARCHITECT (v1.0 - Saturn Release)
+
+🟢 FASE 1: LA INTERFAZ DE COMANDO (CLI) [DONE]
+- Objetivo: Herramienta de terminal robusta.
+- Resultado: Comando global `ascii-arch` con comandos `flow` y `scan`.
+
+🟡 FASE 2: EL "ROUTER" (ADIÓS COORDENADAS) [DONE]
+- Objetivo: Layout automático y Manhattan Routing.
+- Resultado: Orquestación 2D, Smart Anchors, Vertical Routing y efecto Saturn.
+
+🔴 FASE 3: EMPAQUETADO Y DISTRIBUCIÓN [DONE]
+- Objetivo: `pip install .` funcional.
+- Resultado: `pyproject.toml`, estructura de paquete limpia, rutas dinámicas para modelos.
+
+🔵 FASE 4: EXPANSIÓN (ROADMAP FUTURO)
+- [ ] Detección de dependencias `import` avanzada para el scanner.
+- [ ] Modo UML: Diagramas de clase con relaciones N:M.
+- [ ] Exportación: Soporte para PNG/SVG.
+- [ ] Optimización: Reducir tiempo de carga del motor neuronal (GPT-2).

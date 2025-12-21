@@ -6,32 +6,54 @@ from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from pathlib import Path
 
 # Detectar dónde está instalado el archivo y buscar modelos relativos
-BASE_DIR = Path(__file__).resolve().parent.parent.parent # Sube de src/ascii_architect/ a root/
-# PRIORIDAD: Carpeta research/models (Entorno de desarrollo)
-# FALLBACK: Carpeta models/ (Directorio raíz estándar)
-DEFAULT_MODELS_V2 = BASE_DIR / "research" / "models" / "ASCII_Architect_V2_Expansion"
-DEFAULT_MODELS_V1 = BASE_DIR / "models" / "ASCII_Architect_V1_Models"
+# Estructura: root/src/ascii_architect/neural_engine.py -> Sube 3 niveles
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# PRIORIDADES DE BÚSQUEDA:
+# 1. Variable de Entorno
+# 2. Carpeta research/models (Entorno de desarrollo / Local)
+# 3. Carpeta models/ (Directorio raíz estándar tras descarga manual)
+DEFAULT_V2_RESEARCH = BASE_DIR / "research" / "models" / "ASCII_Architect_V2_Expansion"
+DEFAULT_V1_RESEARCH = BASE_DIR / "research" / "models" / "ASCII_Architect_V1_Models"
+DEFAULT_V2_ROOT = BASE_DIR / "models" / "ASCII_Architect_V2_Expansion"
+DEFAULT_V1_ROOT = BASE_DIR / "models" / "ASCII_Architect_V1_Models"
 
 class ArchitectEngine:
     def __init__(self):
-        # 1. LOCALIZADOR DE MODELOS
-        # Buscamos en variables de entorno o usamos los paths por defecto
-        self.models_v2_path = os.getenv("ASCII_ARCH_MODELS_V2", str(DEFAULT_MODELS_V2))
-        self.models_v1_path = os.getenv("ASCII_ARCH_MODELS_V1", str(DEFAULT_MODELS_V1))
-        
-        # Check existencia
+        # 1. LOCALIZADOR DE MODELOS CON FALLBACK ROBUSTO
+        self.models_v2_path = os.getenv("ASCII_ARCH_MODELS_V2")
+        self.models_v1_path = os.getenv("ASCII_ARCH_MODELS_V1")
+
+        if not self.models_v2_path:
+            # Buscar en research o en root
+            if DEFAULT_V2_RESEARCH.exists():
+                self.models_v2_path = str(DEFAULT_V2_RESEARCH)
+            elif DEFAULT_V2_ROOT.exists():
+                self.models_v2_path = str(DEFAULT_V2_ROOT)
+            else:
+                self.models_v2_path = str(DEFAULT_V2_ROOT) # Default final path
+
+        if not self.models_v1_path:
+            if DEFAULT_V1_RESEARCH.exists():
+                self.models_v1_path = str(DEFAULT_V1_RESEARCH)
+            elif DEFAULT_V1_ROOT.exists():
+                self.models_v1_path = str(DEFAULT_V1_ROOT)
+            else:
+                self.models_v1_path = str(DEFAULT_V1_ROOT)
+
+        # Check existencia final
         self.v2_ready = os.path.exists(self.models_v2_path)
         self.v1_ready = os.path.exists(self.models_v1_path)
         
         if not self.v1_ready and not self.v2_ready:
-             # Lanzamos información pero no bloqueamos (el Router manejará el fallback)
-             print(f"⚠️ [WARNING] No se encontraron modelos en:")
+             print(f"⚠️ [IA WARNING] No se encontraron modelos en:")
              print(f"   V2: {self.models_v2_path}")
              print(f"   V1: {self.models_v1_path}")
+             print(f"   Nota: El sistema usará el modo Plantillas automáticamente.")
         else:
              print(f"✅ MOTOR ARQUITECTO ONLINE.")
              if self.v2_ready: print(f"   - V2 Models: ACTIVE")
-             if self.v1_ready: print(f"   - V1 Models: ACTIVE (Legacy Fallback)")
+             if self.v1_ready: print(f"   - V1 Models: ACTIVE (Fallback)")
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 

@@ -11,7 +11,7 @@ def inject_text(box_art: str, text: str) -> str:
     center_idx = len(lines) // 2
     
     for i, line in enumerate(lines):
-        # Limpiar anchors
+        # Limpiar anchors (V18 design)
         clean_line = line.replace("N", "-").replace("S", "-").replace("W", "|").replace("E", "|")
         
         if i == center_idx:

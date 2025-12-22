@@ -40,12 +40,13 @@ Located in `src/ascii_architect/`. Used by default.
     *   **Entry Point:** `app()` instance connected to `pyproject.toml`.
 
 5.  **The Narrator (`narrator.py`)** [AI BRIDGE]:
-    *   **Role:** Virtual Architect. Provides structural analysis (local) or humanized interpretation (remote).
+    *   **Role:** Virtual Architect. Delegates structural interpretation to an external intelligence layer.
     *   **Logic:**
         *   **Dual Mode:** Supports a `use_ai` flag to toggle between local and remote analysis.
-        *   **Local Report:** Parses the topology text and generates a detailed ASCII report of relationships.
-        *   **Remote Bridge (n8n):** Sends the topology via POST to a local n8n webhook for LLM (Gemini) processing.
-        *   **Dependency:** Uses the `requests` library for the remote bridge.
+        *   **Local Mode:** Simplified topology report listing connections directly.
+        *   **Remote Bridge (n8n):** Sends the topology via POST to a local n8n webhook (`localhost:5678`).
+        *   **Robust Parsing:** Handles raw Gemini lists, dictionaries, or plain text responses from n8n.
+        *   **Dependency:** Uses `requests` and `json`.
 
 ### B. The "Research" Side (Neural & Experimental)
 Located in `research/` (data/weights) and accessed via the engine wrapper.

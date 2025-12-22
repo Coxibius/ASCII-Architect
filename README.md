@@ -22,7 +22,7 @@ It uses a Hybrid Architecture:
 
 📐 Symbolic Router (Python): A deterministic "Manhattan-style" engine handles grid layout, smart anchoring, and arrow routing.
 
-🎙️ Virtual Architect (Gemini): An AI-powered explainer that analyzes the graph and provides architectural insights using project-specific context.
+🎙️ Virtual Architect (n8n Bridge): An AI-powered explainer that delegates analysis to an n8n workflow (Gemini), allowing for complex architectural reasoning without local API keys.
 
 ✨ Key Features
 
@@ -69,13 +69,15 @@ pip install .
 
 3. Extráelo exactamente en: `models/ASCII_Architect_V2_Expansion/`.
 
-### 4. 🔑 Configure Gemini (Optional)
-Para usar el **Narrador IA**, crea un archivo `.env` en la raíz del proyecto:
-```ini
-GOOGLE_API_KEY=tu_api_key_aqui
-```
+### 4. 🪢 Configure n8n Bridge (AI Narrator)
+El **Narrador IA** ahora funciona mediante un puente con **n8n**. Asegúrate de tener n8n corriendo localmente:
+
+1.  Importa el workflow de explicación en n8n.
+2.  El webhook debe estar activo en: `http://localhost:5678/webhook/explain`.
+3.  Tu workflow de n8n se encargará de llamar a Gemini u otro LLM.
+
 > [!TIP]
-> Puedes obtener una llave gratuita en [Google AI Studio](https://aistudio.google.com/apikey).
+> Esto permite mayor flexibilidad y seguridad, ya que las llaves de API se gestionan en n8n y no en el código local.
 
 🎮 Usage
 

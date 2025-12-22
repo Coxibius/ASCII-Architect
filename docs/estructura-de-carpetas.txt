@@ -21,6 +21,7 @@
   │       ├── neural_engine.py          # Bridge de IA
   │       ├── scanner.py                # Analizador de Proyectos
   │       ├── canvas.py                 # Grid 2D
+  │       ├── narrator.py               # Narrador IA (n8n Bridge)
   │       └── utils/                    # Utilerías unificadas
   │
   ├── pyproject.toml                    # Configuración de empaquetado

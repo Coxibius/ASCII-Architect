@@ -8,15 +8,12 @@ if current_dir not in sys.path: sys.path.append(current_dir)
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path: sys.path.append(parent_dir)
 
+# Importación de Router (Maneja Canvas internamente)
 try:
-    from engine import ArchitectEngine
+    from ascii_architect.router import Router
 except ImportError:
-    from ascii_architect.engine import ArchitectEngine
-
-try:
-    from ascii_architect.canvas import Canvas
-except ImportError:
-    from canvas import Canvas
+    # Intento de importación relativa si se ejecuta desde src/
+    from router import Router
 
 # ==========================================
 # 🖌️ FUNCIONES DE MAQUILLAJE (UTILS)
@@ -56,49 +53,22 @@ def inject_text(box_art, text):
             
     return "\n".join(new_lines)
 
-# ==========================================
-# 🚀 MAIN
-# ==========================================
+from ascii_architect.router import Router
+
 def main():
-    print("🏗️ INICIANDO SISTEMA V18 (FINAL RENDER)...")
+    # Permitir que el usuario pase un flow string por linea de comandos
+    # Ej: python src/main.py "A -> B ; C -> D"
+    if len(sys.argv) > 1:
+        layout = sys.argv[1]
+    else:
+        # Ejemplo por defecto si no hay argumentos
+        layout = "POSTGRES -> FASTAPI ; REDIS -> FASTAPI"
+
+    print("--- ASCII ARCHITECT - MOTOR V1.8 ---")
     
-    brain = ArchitectEngine()      
-    paper = Canvas(width=80, height=20) 
-    
-    # 1. GENERACIÓN
-    print("🤖 Generando componentes...")
-    raw_db = brain.generate("BOX", "[STYLE:SOLID]", "[DIM:14x5]")
-    raw_api = brain.generate("BOX", "[STYLE:SOLID]", "[DIM:12x5]")
-    raw_arrow = brain.generate("ARROW", "[DIR:RIGHT]", "[LEN:6]")
-    
-    # 2. PROCESAMIENTO (Texturizado)
-    print("🖌️ Inyectando etiquetas...")
-    final_db = inject_text(raw_db, "POSTGRES")
-    final_api = inject_text(raw_api, "FASTAPI")
-    
-    # 3. COMPOSICIÓN (Layout Manual)
-    print("🎨 Estampando en Canvas...")
-    # Izquierda
-    paper.stamp(4, 5, final_db)
-    
-    # Centro (La flecha empieza donde termina la caja 1)
-    # x = 4 (inicio) + 14 (ancho caja) = 18.
-    # Ajustamos un poco para que se solape visualmente
-    paper.stamp(17, 7, raw_arrow) 
-    
-    # Derecha (Donde termina la flecha)
-    # x = 17 + 6 = 23.
-    paper.stamp(23, 5, final_api)
-    
-    # 4. RENDER FINAL
-    print("\n" + "="*40)
-    print("   DIAGRAMA DE ARQUITECTURA (V18)")
-    print("="*40)
-    
-    # Renderizamos y limpiamos cualquier ░ residual
-    print(paper.render().replace("░", " "))
-    
-    print("="*40)
+    # Usamos el Router oficial que ya maneja Canvas, Anchors y Layout
+    router = Router(use_neural_engine=False)
+    router.process(layout)
 
 if __name__ == "__main__":
     main()

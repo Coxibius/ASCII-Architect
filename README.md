@@ -8,7 +8,7 @@
   / _ \ \___ \| |    | | | |    / _ \ | '__| '_ \| | __/ _ \/ __| __|
  / ___ \ ___) | |___ | | | |   / ___ \| |  | | | | | ||  __/ (__| |_ 
 /_/   \_\____/ \____|___|___| /_/   \_\_|  |_| |_|_|\__\___|\___|\__|
-                                                       v1.0-beta
+                                                       v1.1.0-beta
 ```
 ![alt text](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![alt text](https://img.shields.io/badge/Python-3.9%2B-blue)
@@ -21,6 +21,8 @@ It uses a Hybrid Architecture:
 🧠 Neural Engine (GPT-2): Fine-tuned Small Language Models (SLMs) generate the shapes (Cylinders, Diamonds, Softboxes).
 
 📐 Symbolic Router (Python): A deterministic "Manhattan-style" engine handles grid layout, smart anchoring, and arrow routing.
+
+🎙️ Virtual Architect (Gemini): An AI-powered explainer that analyzes the graph and provides architectural insights using project-specific context.
 
 ✨ Key Features
 
@@ -65,13 +67,15 @@ pip install .
 > [!NOTE]
 > Esto registrará el comando `ascii-arch` en tu sistema.
 
-### 3. 📥 Download the Brains (Models)
-*Opcional: Solo necesario para el modo Neural.*
-
-Puesto que los pesos de los modelos son pesados, se alojan en la sección de Releases.
-1. Ve a la [Releases Page](https://github.com/Coxibius/ASCII-Architect/releases).
-2. Descarga `ASCII_Architect_V2_Expansion.zip`.
 3. Extráelo exactamente en: `models/ASCII_Architect_V2_Expansion/`.
+
+### 4. 🔑 Configure Gemini (Optional)
+Para usar el **Narrador IA**, crea un archivo `.env` en la raíz del proyecto:
+```ini
+GOOGLE_API_KEY=tu_api_key_aqui
+```
+> [!TIP]
+> Puedes obtener una llave gratuita en [Google AI Studio](https://aistudio.google.com/apikey).
 
 🎮 Usage
 
@@ -88,8 +92,15 @@ Analiza automáticamente la estructura de tu proyecto y genera un diagrama:
 # Analiza la raíz con profundidad 1 (por defecto)
 ascii-arch scan .
 
-# Analiza con mayor profundidad
-ascii-arch scan . --depth 2
+# Analiza con mayor profundidad y especifica el directorio
+# (Usa -- para separar el comando del directorio si usas opciones antiguas de Typer)
+ascii-arch scan -- src --depth 2
+
+# 📖 REPORTE LOCAL: Genera una explicación textual de las dependencias
+ascii-arch scan . --explain
+
+# 🤖 ANÁLISIS IA: Envía la topología a n8n para un análisis humano avanzado
+ascii-arch scan . --ai
 ```
 
 ### 🚀 Advanced Matrix Flow

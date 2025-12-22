@@ -1,19 +1,52 @@
-🚀 ROADMAP: ASCII-ARCHITECT (v1.0 - Saturn Release)
+═══════════════════════════════════════════════════════════════════════════
+  🚀 ROADMAP: ASCII-ARCHITECT
+  Current Version: v1.1.0 (The AI-Bridge Update)
+═══════════════════════════════════════════════════════════════════════════
 
-🟢 FASE 1: LA INTERFAZ DE COMANDO (CLI) [DONE]
-- Objetivo: Herramienta de terminal robusta.
-- Resultado: Comando global `ascii-arch` con comandos `flow` y `scan`.
+🟢 FASE 1: CORE ENGINE & CLI [COMPLETADO]
+   Status: ✅ DONE
+   - [x] Motor de renderizado híbrido (Neural + Determinista).
+   - [x] Interfaz de comando CLI (`flow`, `box`).
+   - [x] Sistema de Grillas 2D (Canvas) y inyección de texto.
 
-🟡 FASE 2: EL "ROUTER" (ADIÓS COORDENADAS) [DONE]
-- Objetivo: Layout automático y Manhattan Routing.
-- Resultado: Orquestación 2D, Smart Anchors, Vertical Routing y efecto Saturn.
+🟡 FASE 2: THE INTELLIGENT ROUTER [COMPLETADO]
+   Status: ✅ DONE
+   - [x] Algoritmo de ruteo "Manhattan" (codos ortogonales).
+   - [x] Auto-detección de formas (Semántica).
+   - [x] Efecto Saturno (Diamantes procedurales para texto largo).
+   - [x] Smart Anchors (N, S, E, W).
 
-🔴 FASE 3: EMPAQUETADO Y DISTRIBUCIÓN [DONE]
-- Objetivo: `pip install .` funcional.
-- Resultado: `pyproject.toml`, estructura de paquete limpia, rutas dinámicas para modelos.
+🔴 FASE 3: PACKAGING & DISTRIBUTION [COMPLETADO]
+   Status: ✅ DONE
+   - [x] Configuración `pyproject.toml`.
+   - [x] Instalación global (`pip install .`).
+   - [x] Manejo de dependencias y rutas relativas para modelos.
 
-🔵 FASE 4: EXPANSIÓN (ROADMAP FUTURO)
-- [ ] Detección de dependencias `import` avanzada para el scanner.
-- [ ] Modo UML: Diagramas de clase con relaciones N:M.
-- [ ] Exportación: Soporte para PNG/SVG.
-- [ ] Optimización: Reducir tiempo de carga del motor neuronal (GPT-2).
+🟣 FASE 4: SEMANTIC SCANNER (DEEP SCAN) [COMPLETADO]
+   Status: ✅ DONE
+   - [x] Comando `scan`.
+   - [x] Detección de tipos de archivo (.sql, .py, dirs).
+   - [x] Análisis de dependencias `import` (Python) mediante Regex.
+
+🧠 FASE 5: THE NARRATOR (DUAL-MODE) [COMPLETADO]
+   Status: ✅ DONE
+   - [x] Reporte estructural local detallado (`--explain`).
+   - [x] Puente n8n para inteligencia avanzada (`--ai`).
+   - [x] Desacoplamiento de API Keys directas (Carga delegada a n8n).
+
+═══════════════════════════════════════════════════════════════════════════
+  🔮 FUTURO (NEXT STEPS)
+═══════════════════════════════════════════════════════════════════════════
+
+🔵 v1.x: QUALITY OF LIFE
+   - [ ] Soporte para exportar a imagen (PNG/SVG).
+   - [ ] Optimización de carga (Lazy loading más agresivo).
+   - [ ] Soporte para comentarios en el código que dicten la forma (e.g. `# @shape:diamond`).
+
+🧠 v2.0: ADVANCED WORKFLOWS
+   - [ ] Integración con APIs locales (Ollama/Llama3).
+   - [ ] Webhooks dinámicos para CI/CD (Automatización de diagramas en Git).
+
+🌐 v3.0: THE UNIVERSAL MAPPER
+   - [ ] Soporte para analizar otros lenguajes (JavaScript imports, C# usings).
+   - [ ] Diagramas de Clase UML reales.

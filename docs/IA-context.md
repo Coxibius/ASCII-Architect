@@ -1,7 +1,7 @@
-# 🧠 IA Context: ASCII Architect Project (V1.0 - Saturn Release)
+# 🧠 IA Context: ASCII Architect Project (V1.1 - The AI-Bridge Update)
 
 > **System Note for AI Agents:**  
-> This document is the SINGLE SOURCE OF TRUTH for the "ASCII Architect" codebase structure and capabilities. The project has undergone a major refactor to separate "Product" (CLI/Templates) from "Research" (ML Models).
+> This document is the SINGLE SOURCE OF TRUTH for the "ASCII Architect" codebase structure and capabilities. The project uses a Hybrid Architecture where AI logic is decoupled from the Symbolic Router.
 
 ---
 
@@ -9,7 +9,7 @@
 **Name:** ASCII Architect  
 **Goal:** Engineering-grade ASCII diagram generator for the terminal. Hybrid architecture (Deterministic + Neural).  
 **Philosophy:** "Engineering over Art". Precision > Style.  
-**Version:** v1.0.0 (The Saturn Update)  
+**Version:** v1.1.0 (The AI-Bridge Update)  
 **Package Name:** `ascii-architect` (Installable via pip)
 
 ---
@@ -38,6 +38,14 @@ Located in `src/ascii_architect/`. Used by default.
     *   **Library:** `Typer`.
     *   **Commands:** `flow`, `scan`.
     *   **Entry Point:** `app()` instance connected to `pyproject.toml`.
+
+5.  **The Narrator (`narrator.py`)** [AI BRIDGE]:
+    *   **Role:** Virtual Architect. Provides structural analysis (local) or humanized interpretation (remote).
+    *   **Logic:**
+        *   **Dual Mode:** Supports a `use_ai` flag to toggle between local and remote analysis.
+        *   **Local Report:** Parses the topology text and generates a detailed ASCII report of relationships.
+        *   **Remote Bridge (n8n):** Sends the topology via POST to a local n8n webhook for LLM (Gemini) processing.
+        *   **Dependency:** Uses the `requests` library for the remote bridge.
 
 ### B. The "Research" Side (Neural & Experimental)
 Located in `research/` (data/weights) and accessed via the engine wrapper.
@@ -93,6 +101,7 @@ ASCII-Architect/
         ├── neural_engine.py          # AI Bridge
         ├── scanner.py                # Project Analyzer
         ├── canvas.py                 # 2D Grid
+        ├── narrator.py               # AI Explainer (Gemini)
         └── utils/                    # Shared Helpers
             └── __init__.py           # Contains inject_text
 ```

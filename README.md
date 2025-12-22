@@ -1,6 +1,7 @@
 # 🏛️ ASCII Architect
 
 > **The Neural-Symbolic Diagram Generator for the Terminal.**
+> *Turn your code structure into engineering-grade ASCII diagrams instantly.*
 
 ```text
     _    ____   ____ ___ ___      _         _     _ _            _   
@@ -8,157 +9,96 @@
   / _ \ \___ \| |    | | | |    / _ \ | '__| '_ \| | __/ _ \/ __| __|
  / ___ \ ___) | |___ | | | |   / ___ \| |  | | | | | ||  __/ (__| |_ 
 /_/   \_\____/ \____|___|___| /_/   \_\_|  |_| |_|_|\__\___|\___|\__|
-                                                       v1.1.0-beta
+                                                       v1.1.0
 ```
-![alt text](https://img.shields.io/badge/License-MIT-yellow.svg)
-![alt text](https://img.shields.io/badge/Python-3.9%2B-blue)
-![alt text](https://img.shields.io/badge/Architecture-Neural--Symbolic-purple)
 
-ASCII Architect is an engineering-grade tool designed to generate precision ASCII diagrams directly in your CLI. Unlike standard generative art, this tool prioritizes structural integrity, grid alignment, and semantic logic for software documentation.
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Architecture](https://img.shields.io/badge/Architecture-Neural--Symbolic-purple)
+![AI](https://img.shields.io/badge/AI-Gemini%20via%20n8n-orange)
 
-It uses a Hybrid Architecture:
+ASCII Architect is a CLI tool designed for backend developers and ML engineers who live in the terminal. It solves the "Documentation Rot" problem by reverse-engineering your code into diagrams on the fly.
 
-🧠 Neural Engine (GPT-2): Fine-tuned Small Language Models (SLMs) generate the shapes (Cylinders, Diamonds, Softboxes).
+It features a **Hybrid Neuro-Symbolic Architecture**:
+- **Product Mode:** Deterministic rendering for pixel-perfect diagrams.
+- **Research Mode:** Experimental GPT-2 Spatial Generation.
+- **Narrator Mode:** AI-powered architectural analysis via n8n/Gemini.
 
-📐 Symbolic Router (Python): A deterministic "Manhattan-style" engine handles grid layout, smart anchoring, and arrow routing.
+## ✨ Key Features
 
-🎙️ Virtual Architect (n8n Bridge): An AI-powered explainer that delegates analysis to an n8n workflow (Gemini), allowing for complex architectural reasoning without local API keys.
+### 🔍 Auto-Discovery Agent (`scan`)
+Visualize your folder structure with semantic shape detection:
+- `database.sql` → **Cylinder** (Database)
+- `auth_service.py` → **Box** (Service)
+- `user_model.py` → **Softbox** (Entity/Actor)
+- `verify_logic.py` → **Diamond** (Decision/Logic)
 
-✨ Key Features
+### 🤖 "The Narrator" (AI Analysis)
+Don't just draw it, explain it. The tool connects to **n8n** (Google Gemini) to analyze the generated graph and explain your system's architecture in natural language.
 
-Matrix / Grid Layout: Use ; to define rows and -> for columns.
+---
 
-### 📑 Semantic Cheat Sheet (Keyword-to-Shape)
+## 🚀 Quick Start
 
-| Keyword / Context | Shape Type | Visual Meaning |
-| :--- | :--- | :--- |
-| `DB`, `DATA`, `SQL`, `SQLITE` | **CYLINDER** | Database / Storage |
-| `?`, `IF`, `DECISION` | **DIAMOND** | Decision Node (Saturn Effect) |
-| `USER`, `CLIENT`, `AUTH`, `[DIR]` | **SOFTBOX** | Human Actor / Entry Point / Folder |
-| `PROCESS`, `API`, `DEFAULT` | **BOX** | Standard Operation / Task |
-
-Semantic Shape Detection: The engine automatically selects the right shape based on your text:
-
-DB, DATA, SQL → Cylinder (Database)
-
-?, IF, DECISION → Diamond (Decision Node)
-
-USER, START, END → Softbox (Rounded)
-
-Default → Box (Rectangular)
-
-Smart Anchors: Arrows calculate exact entry/exit points (e.g., Diamond tips) to avoid visual clipping.
-
-Vertical Routing: Automatically draws vertical connections between rows.
-
-⚡ Quick Start
-
-### 1. Clone the Repository
+### 1. Installation
 ```bash
 git clone https://github.com/Coxibius/ASCII-Architect.git
 cd ASCII-Architect
-```
-
-### 2. Install the Package
-Instala la herramienta y sus dependencias de forma global o en tu entorno virtual:
-```bash
 pip install .
 ```
-> [!NOTE]
-> Esto registrará el comando `ascii-arch` en tu sistema.
 
-3. Extráelo exactamente en: `models/ASCII_Architect_V2_Expansion/`.
-
-### 4. 🪢 Configure n8n Bridge (AI Narrator)
-El **Narrador IA** ahora funciona mediante un puente con **n8n**. Asegúrate de tener n8n corriendo localmente:
-
-1.  Importa el workflow de explicación en n8n.
-2.  El webhook debe estar activo en: `http://localhost:5678/webhook/explain`.
-3.  Tu workflow de n8n se encargará de llamar a Gemini u otro LLM.
-
-> [!TIP]
-> Esto permite mayor flexibilidad y seguridad, ya que las llaves de API se gestionan en n8n y no en el código local.
-
-🎮 Usage
-
-Tras la instalación, puedes usar el comando global `ascii-arch`.
-
-### Basic Horizontal Flow
+### 2. Scan your project (The Magic Command)
+Analyze your current directory structure.
 ```bash
-ascii-arch flow "CLIENT -> API_GATEWAY -> SERVER"
+ascii-arch scan . --depth 2
 ```
 
-### 🕵️ Auto-Discovery (Scan)
-Analiza automáticamente la estructura de tu proyecto y genera un diagrama:
+### 3. Ask the AI (`--ai`)
+Generate the diagram AND ask the AI to explain the architecture.
+*(Requires local n8n setup).*
 ```bash
-# Analiza la raíz con profundidad 1 (por defecto)
-ascii-arch scan .
-
-# Analiza con mayor profundidad y especifica el directorio
-# (Usa -- para separar el comando del directorio si usas opciones antiguas de Typer)
-ascii-arch scan -- src --depth 2
-
-# 📖 REPORTE LOCAL: Genera una explicación textual de las dependencias
-ascii-arch scan . --explain
-
-# 🤖 ANÁLISIS IA: Envía la topología a n8n para un análisis humano avanzado
-ascii-arch scan . --ai
+ascii-arch scan src --depth 2 --ai
 ```
 
-### 🚀 Advanced Matrix Flow
-Usa `;` para saltos de línea y el flag `--neural` (o `-n`) para usar la IA:
+### 4. Manual Design
+Draw specific flows for your documentation.
 ```bash
-ascii-arch flow "USER -> LOGIN_API -> AUTH_SERVICE ; IS_LOGGED? -> USER_DB ; ERROR_PAGE" --neural
+ascii-arch flow "User -> API_Gateway -> [Service_A, Service_B] ; Service_A -> Redis_Cache"
 ```
 
-Output Preview:
+---
+
+## 🏗️ Example Output (Meta-Analysis)
+
+Asking ASCII Architect to analyze its own source code:
+
+**Command:** `ascii-arch scan src --ai`
+
+**Diagram:**
 ```text
-  .----------.        +-----------+      +--------------+
-  |          |        |           |      |              |
-  |   USER   |------->| LOGIN_API |----->| AUTH_SERVICE |
-  |          |        |           |      |              |
-  '----------'        +-----------+      +--------------+
-        |                   |
-        |                   |
-  -     v             .=====v====.
-       / \            |          |
-      /   \           + USER_DB  +
-     /     \          |          |
-    /       \         '=====-===='
-   IS_LOGGED?  ------>
-  |           |
-    \       /
-      \   /
-        v
-  +-----------+
-  |           |
-  | ERROR_PG  |
-  |           |
-  +-----------+
+.-------------------.          +----------+
+|  ascii_architect  |--------->|  cli.py  |
+|       [DIR]       |          +----------+
+'-------------------'                |
+          |                          v
+          |                    +-----------+
+          +------------------->| router.py |
+                               +-----------+
+                                     |
+                     +---------------+----------------+
+                     |               |                |
+               .-----v-----.   +-----v-----.   +------v-------+
+               | neural_eng|   | renderers |   | narrator.py  |
+               '-----------'   +-----------+   +--------------+
 ```
-🏗️ Architecture
 
-ASCII Architect solves the "Generative AI Hallucination" problem by decoupling Shape Generation from Layout Logic.
+**AI Analysis (Gemini):**
+> "This architecture follows a clear Command Dispatcher pattern. The `cli.py` acts as the interface layer, delegating execution to the `router.py`, which serves as the central orchestrator. The router creates a strong decoupling between the Logic Layer (Neural Engine/Renderers) and the Presentation Layer. The presence of `narrator.py` suggests a focus on user experience and explainability."
 
-Parser: Splits the input string into a Virtual Grid (Row, Col).
+---
 
-Dispatcher: Scans keywords (e.g., "DB") and requests a specific shape from the Neural Engine.
-
-Inference: The specific GPT-2 Expert generates the ASCII character block.
-
-Router: The Python engine calculates (x, y) coordinates, aligns centers, and draws connections (|, ->) using geometric logic, not AI.
-
-🗺️ Roadmap
-
-v0.1: Horizontal flow engine.
-
-v1.0: Matrix Layout, Vertical Routing, and Semantic Models.
-
-v1.5: Dynamic Text Resizing (Auto-expand shapes).
-
-v2.0: "Manhattan" Elbow routing (complex paths around obstacles).
-
-📄 License
-
+## 📄 License
 MIT License. Created by Coxibius.
+
+**Engineering over Art.**
 

@@ -1,114 +1,93 @@
-# 🧠 IA Context: ASCII Architect Project (V1.1 - The AI-Bridge Update)
+# 🧠 IA Context: ASCII Architect Project (v1.1 Stable)
 
-> **System Note for AI Agents:**  
-> This document is the SINGLE SOURCE OF TRUTH for the "ASCII Architect" codebase structure and capabilities. The project uses a Hybrid Architecture where AI logic is decoupled from the Symbolic Router.
+> **System Note:** This document is the SOURCE OF TRUTH for the codebase structure. Use this to understand the Hybrid Neuro-Symbolic Architecture and the n8n integration.
 
 ---
 
 ## 1. Project Identity
 **Name:** ASCII Architect  
-**Goal:** Engineering-grade ASCII diagram generator for the terminal. Hybrid architecture (Deterministic + Neural).  
-**Philosophy:** "Engineering over Art". Precision > Style.  
-**Version:** v1.1.0 (The AI-Bridge Update)  
-**Package Name:** `ascii-architect` (Installable via pip)
+**Goal:** Engineering-grade ASCII diagram generator & Reverse Engineering tool.  
+**Version:** v1.1.0 (Modular CLI & AI Narrator)  
+**Package:** `ascii-architect` (Setuptools/Typer)
 
 ---
 
-## 2. Technical Architecture (The Hybrid Core)
+## 2. Architecture Overview
 
-### A. The "Product" Side (Deterministic & Fast)
-Located in `src/ascii_architect/`. Used by default.
+### A. The CLI Layer (`src/ascii_architect/cli.py`)
+- **Library:** Typer.
+- **Entry Point:** `app()` -> `ascii-arch` command.
+- **Commands:**
+    - `flow`: Manual diagram generation.
+    - `scan`: Automated project analysis.
+- **Flags:** Modular flags (`--graph`, `--explain`, `--ai`) allow independent execution of drawing vs. text analysis.
 
-1.  **The Router (`router.py`)** [ORCHESTRATOR]:
-    *   **Role:** Brain of the operation. Parses string flow (`A -> B`), calculates grid coordinates (Manhattan routing), and decides which engine to call.
-    *   **Logic:**
-        *   `process()`: Main entry point. Handles printing and layout calculation.
-        *   `_get_node_shape()`: Calls `renderers` by default, or `neural_engine` if requested.
-        *   **Saturn Logic:** Detects long diamonds and applies procedural generation.
+### B. The Orchestrator (`src/ascii_architect/router.py`)
+- **Role:** Central Hub. Receives commands from CLI and delegates to engines.
+- **Logic:**
+    - Parses input strings (`A -> B`).
+    - Calculates Grid Layout & Manhattan Routing (Elbow arrows).
+    - **Hybrid Decision:** Calls `neural_engine` (experimental) OR `renderers` (deterministic/templates).
 
-2.  **The Renderers (`renderers.py`)**:
-    *   **Role:** Pure Python string manipulation for instant, perfect shapes.
-    *   **Classes:** `BoxRenderer`, `CylinderRenderer`, `SoftBoxRenderer`, `DiamondRenderer` (Saturn logic implemented here).
+### C. The Eyes (`src/ascii_architect/scanner.py`)
+- **Role:** Deep dependency analysis.
+- **Mechanism:**
+    - Recursive directory walk.
+    - **Strict Depth Filter:** Prevents connecting to files deeper than the requested `--depth`.
+    - **Regex Parsing:** Reads Python files to find `import X` and draws dynamic connections.
+- **Semantic Mapping:**
+    - `.sql` -> Cylinder
+    - `.py` -> Box
+    - Directories -> Softbox
 
-3.  **The Scanner (`scanner.py`)**:
-    *   **Role:** Recursively scans project directories using `pathlib`.
-    *   **Logic:** Semantic mapping (Extension -> Shape). `.sql`=Cylinder, `.py`=Box, Directory=SoftBox.
+### D. The Voice (`src/ascii_architect/narrator.py`)
+- **Role:** Generates architectural explanations.
+- **Modes:**
+    1.  **Local (`--explain`):** Formats the raw graph topology into a readable text list.
+    2.  **AI (`--ai`):** Sends the topology to a local **n8n Webhook** (`http://localhost:5678/webhook/explain`).
+    - **Why n8n?** Bypasses complex local API setups and quota limits by offloading logic to a visual workflow.
 
-4.  **The CLI (`cli.py`)**:
-    *   **Library:** `Typer`.
-    *   **Commands:** `flow`, `scan`.
-    *   **Entry Point:** `app()` instance connected to `pyproject.toml`.
-
-5.  **The Narrator (`narrator.py`)** [AI BRIDGE]:
-    *   **Role:** Virtual Architect. Delegates structural interpretation to an external intelligence layer.
-    *   **Logic:**
-        *   **Dual Mode:** Supports a `use_ai` flag to toggle between local and remote analysis.
-        *   **Local Mode:** Simplified topology report listing connections directly.
-        *   **Remote Bridge (n8n):** Sends the topology via POST to a local n8n webhook (`localhost:5678`).
-        *   **Robust Parsing:** Handles raw Gemini lists, dictionaries, or plain text responses from n8n.
-        *   **Dependency:** Uses `requests` and `json`.
-
-### B. The "Research" Side (Neural & Experimental)
-Located in `research/` (data/weights) and accessed via the engine wrapper.
-
-1.  **The Neural Engine (`neural_engine.py`)**:
-    *   **Role:** Wrapper for Fine-tuned GPT-2.
-    *   **Mechanism:** Loads models from `research/models/` or `models/`.
-    *   **Dynamic Paths:** Uses `Path(__file__).resolve().parent.parent.parent` to find root.
-    *   **Search Priority:** Environment Vars > Research Folder > Root models/ Folder.
-
-2.  **The Lab (`research/` folder)**:
-    *   **Notebooks:** Training logs.
-    *   **Datasets:** JSONL files (`dataset_boxes.jsonl`, etc.).
+### E. The Hybrid Engine
+- **Deterministic:** `renderers.py` (Box, Cylinder, Diamond Saturn Effect).
+- **Neural:** `neural_engine.py` (GPT-2 Wrapper, uses `<L01>` tokens).
 
 ---
 
-## 3. Critical Logic & Algorithms
-
-### The Saturn Effect (Procedural Diamonds)
-**Problem:** Large diamonds look like obelisks when AI tries to scale them.
-**Solution:** Fixed height cones (3 lines) + floating body with dynamic width.
-**Implementation:** `renderers.py` -> `DiamondRenderer`.
-
-### Auto-Discovery (Semantic Scanning)
-**Logic:**
-- Ignores `.git`, `node_modules`, `venv`, `__pycache__`.
-- `.sql`, `.db`, `.sqlite` -> **CYLINDER**.
-- Names with `Service`, `Controller`, `Manager` -> **BOX**.
-- Names with `User`, `Client`, `Auth` -> **SOFTBOX**.
-- Directories -> **SOFTBOX [DIR]**.
-- Others -> **BOX**.
-
----
-
-## 4. File Structure (v1.0 Package)
+## 3. File Structure (Refactored)
 
 ```text
 ASCII-Architect/
-├── pyproject.toml                    # Packaging configuration
-├── requirements.txt                  # Dependencies
-├── README.md                         # User guide
 │
-├── research/                         # AI EXPERIMENTS & DATA
-│   ├── models/                       # Weights (expert_box, etc.)
-│   ├── notebooks/                    # Training Logs
-│   └── datasets/                     # JSONL files
+├── pyproject.toml                    # 📦 Build configuration
+├── requirements.txt
+├── README.md
+├── ROADMAP.txt
 │
-└── src/                              # SOURCE CODE
+├── research/                         # 🔬 ML Artifacts
+│   ├── models/                       # GPT-2 Weights
+│   └── datasets/                     # JSONL Training data
+│
+└── src/                              # 🛠️ Production Code
     └── ascii_architect/
-        ├── cli.py                    # Entry Point
-        ├── router.py                 # Core Engine
-        ├── renderers.py              # Shape Templates
-        ├── neural_engine.py          # AI Bridge
-        ├── scanner.py                # Project Analyzer
-        ├── canvas.py                 # 2D Grid
-        ├── narrator.py               # AI Explainer (Gemini)
+        ├── __init__.py
+        ├── cli.py                    # Commands & Flags
+        ├── router.py                 # Layout Engine
+        ├── scanner.py                # File System Analyzer
+        ├── narrator.py               # Text/AI Generation
+        ├── renderers.py              # Templates
+        ├── neural_engine.py          # AI Wrapper
+        ├── canvas.py                 # Drawing Matrix
         └── utils/                    # Shared Helpers
-            └── __init__.py           # Contains inject_text
 ```
 
-## 5. Development Constraints
-- **NO absolute paths**: Use `pathlib`.
-- **Imports**: Use absolute package paths (`from ascii_architect.item import ...`).
-- **Graceful Fallback**: The system must run without `torch` (Template Mode).
-- **Console Output**: `router.process()` must handle the final `print()`.
+---
+
+## 4. Development Rules
+1. **Dependency Isolation:** `scanner.py` must NEVER draw. It only returns a string representation of the graph.
+2. **CLI Modularity:** Do not couple rendering with analysis. `cli.py` controls the flow:
+   ```python
+   if graph: router.process()
+   if ai: narrator.explain()
+   ```
+3. **n8n Contract:** The Narrator sends a JSON payload `{"text": "A->B", "prompt": "..."}` to the webhook. It expects a JSON response containing the explanation text.
+4. **Path Safety:** All file operations must use `pathlib` relative to `__file__`.

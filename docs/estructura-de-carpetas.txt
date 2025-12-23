@@ -1,30 +1,121 @@
   ═══════════════════════════════════════════════════════════════════════════
-   ESTRUCTURA DE CARPETAS - ASCII ARCHITECT (v1.0.0)
+   🏛️  GUÍA EXHAUSTIVA DE LA ARQUITECTURA - ASCII ARCHITECT (v1.1.0)
   ═══════════════════════════════════════════════════════════════════════════
 
-  ASCII-Architect/
-  ├── docs/                             # 📚 Documentación técnica y Roadmap
-  │   ├── IA-context.md                 # Fuente de verdad para agentes AI
-  │   ├── ROADMAP.txt                   # Estado del desarrollo
-  │   └── estructura-de-carpetas.txt    # [ESTE ARCHIVO]
+  Este documento no es solo una lista de archivos; es el mapa del alma de 
+  ASCII Architect. Aquí se detalla cada rincón del proyecto, su propósito
+  existencial y por qué cada engranaje está donde está.
+
+  ---
+
+  📂 [RAÍZ DEL PROYECTO]
+  El centro de mando donde todo comienza.
+
+  ├── .gitignore
+  │   Propósito: El filtro de realidad. Evita que enviemos "basura" (como entornos
+  │   virtuales .venv, archivos temporales de Python __pycache__ o carpetas de 
+  │   distribución build/dist) al repositorio de Git. Mantiene el proyecto limpio.
   │
-  ├── research/                         # 🔬 Investigación y Entrenamiento
-  │   ├── models/                       # Pesos de modelos GPT-2
-  │   ├── notebooks/                    # Logs de entrenamiento
-  │   └── datasets/                     # Datos sintéticos (JSONL)
+  ├── pyproject.toml
+  │   Propósito: El ADN del paquete. Aquí es donde definimos que este proyecto es
+  │   un paquete instalable llamado `ascii-architect`, especificamos sus dependencias 
+  │   y registramos el comando global `ascii-arch` para que puedas usarlo en tu terminal
+  │   desde cualquier carpeta tras hacer `pip install .`.
   │
-  ├── src/                              # 🛠️ Código Fuente (Paquete)
-  │   └── ascii_architect/
-  │       ├── cli.py                    # Interfaz Typer
-  │       ├── router.py                 # Orquestador Principal
-  │       ├── renderers.py              # Plantillas Deterministas
-  │       ├── neural_engine.py          # Bridge de IA
-  │       ├── scanner.py                # Analizador de Proyectos
-  │       ├── canvas.py                 # Grid 2D
-  │       ├── narrator.py               # Narrador IA (n8n Bridge)
-  │       └── utils/                    # Utilerías unificadas
+  ├── requirements.txt
+  │   Propósito: La lista de suministros. Contiene todas las librerías necesarias 
+  │   (Typer para el CLI, requests para la red, transformers para la IA) para que
+  │   el arquitecto pueda trabajar en cualquier entorno.
   │
-  ├── pyproject.toml                    # Configuración de empaquetado
-  ├── requirements.txt                  # Dependencias base
-  ├── README.md                         # Guía de usuario
-  └── .gitignore                        # Exclusiones
+  ├── README.md
+  │   Propósito: La vitrina y el manual del usuario. Es la primera impresión del "hijo", 
+  │   donde se explica qué hace, cómo se instala y se muestran ejemplos visuales que 
+  │   demuestran su poderío.
+  │
+  └── ROADMAP.txt
+      Propósito: La brújula del destino. Documenta lo que ya logramos y hacia dónde
+      queremos llevar el proyecto en el futuro (como exportación a PNG o soporte
+      para otros lenguajes). Es la declaración de ambición de ASCII Architect.
+
+  ---
+
+  📂 docs/
+  La Biblioteca del Conocimiento. Aquí guardamos la sabiduría teórica.
+
+  ├── IA-context.md
+  │   Propósito: La "Corteza Prefrontal" para agentes de IA. Cuando un asistente 
+  │   como yo entra al proyecto, este archivo le explica las reglas sagradas, la 
+  │   arquitectura híbrida y cómo debe comportarse para no romper nada.
+  │
+  └── estructura-de-carpetas.txt
+      Propósito: El mapa topográfico (este archivo). Detalla la anatomía completa 
+      del proyecto para que cualquier humano o máquina entienda la jerarquía.
+
+  ---
+
+  📂 research/
+  El Laboratorio de I+D. Aquí es donde ocurre la magia experimental.
+  Se mantiene separado del código de producción (`src/`) para no mezclar la 
+  investigación con la ejecución estable.
+
+  ├── models/
+  │   Propósito: El hangar de los "Expertos". Aquí residen los pesos de los modelos 
+  │   fine-tuneados de GPT-2. Cada carpeta (expert_box, expert_arrow) es una 
+  │   neurona dedicada a dibujar una forma específica a la perfección.
+  │
+  ├── notebooks/
+  │   Propósito: El diario del científico. Contiene archivos de Jupyter donde se 
+  │   registran las pruebas de entrenamiento, los fallos y los éxitos del motor neuronal.
+  │
+  └── datasets/
+      Propósito: El combustible. Archivos JSONL con miles de ejemplos de arte ASCII 
+      perfectamente formateados que se usaron para "enseñar" a los modelos a dibujar.
+
+  ---
+
+  📂 src/ascii_architect/
+  La Sala de Máquinas. El corazón palpitante del código de producción.
+
+  ├── cli.py
+  │   Propósito: El Panel de Control. Utiliza la librería `Typer` para interpretar
+  │   lo que escribes en la terminal. Se encarga de validar tus comandos (`flow`, `scan`)
+  │   y de decidir si debe mostrar un dibujo, un reporte, o llamar a la IA.
+  │
+  ├── router.py
+  │   Propósito: El Gran Orquestador (El Cerebro). Es la pieza más compleja. Decide
+  │   dónde colocar cada nodo en una rejilla virtual, cómo trazar las flechas para
+  │   que no se crucen de forma fea y elige qué renderizador usar para cada forma.
+  │
+  ├── scanner.py
+  │   Propósito: Los Ojos del Arquitecto. Camina por las carpetas de tus proyectos,
+  │   lee tus archivos de código usando expresiones regulares para encontrar `imports`
+  │   y deduce la arquitectura de tu software sin que tú tengas que escribir ni una flecha.
+  │
+  ├── narrator.py
+  │   Propósito: La Voz y el Intérprete. Actúa como el puente (Bridge) con el mundo 
+  │   exterior. Traduce diagramas ASCII abstractos a lenguaje humano, ya sea de forma 
+  │   local o conectándose a n8n para consultar a Gemini.
+  │
+  ├── renderers.py
+  │   Propósito: El Taller del Dibujante. Contiene "plantillas" deterministas que 
+  │   garantizan que las cajas y cilindros salgan rectos y perfectos al instante, 
+  │   sin depender siempre de la IA lenta.
+  │
+  ├── neural_engine.py
+  │   Propósito: El Lóbulo de Inferencia. Es el código que sabe cómo cargar los 
+  │   modelos de GPT-2 y "pedirles" que generen una forma específica cuando el 
+  │   usuario activa el flag `--neural`.
+  │
+  ├── canvas.py
+  │   Propósito: El Lienzo Infinito. Una matriz bidimensional de caracteres donde
+  │   se "estampan" las formas y se trazan las líneas. Es el espacio físico donde
+  │   se construye el diagrama final.
+  │
+  └── utils/
+      Propósito: La Caja de Herramientas compartida. Contiene pequeñas funciones 
+      vitales (como `inject_text`) que ayudan a meter texto dentro de las formas 
+      ajustando los espacios para que nada se descuadre.
+
+  ---
+  "Engineering over Art. Precision over Chaos."
+  ═══════════════════════════════════════════════════════════════════════════

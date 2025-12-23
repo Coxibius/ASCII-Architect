@@ -17,7 +17,6 @@ def flow(
     layout: str = typer.Argument(..., help="String de flujo manual."),
     neural: bool = typer.Option(False, "--neural", "-n", help="Usa motor neuronal.")
 ):
-    """Genera un diagrama manual."""
     try:
         router = Router(use_neural_engine=neural)
         router.process(layout)
@@ -27,46 +26,55 @@ def flow(
 @app.command()
 def scan(
     path: str = typer.Argument(".", help="Ruta a analizar"),
-    depth: int = typer.Option(1, "--depth", "-d", help="Nivel de profundidad (1=Solo Raíz, 2=Subcarpetas)."),
-    graph: bool = typer.Option(False, "--graph", "-g", help="Forzar el dibujo del diagrama ASCII."),
-    explain: bool = typer.Option(False, "--explain", "-e", help="Mostrar reporte de texto local."),
-    ai: bool = typer.Option(False, "--ai", help="Consultar análisis a IA (n8n).")
+    depth: int = typer.Option(1, "--depth", "-d", help="Profundidad de escaneo."),
+    graph: bool = typer.Option(True, "--graph/--no-graph", help="Mostrar dibujo ASCII."),
+    explain: bool = typer.Option(False, "--explain", "-e", help="Reporte de texto local."),
+    ai: bool = typer.Option(False, "--ai", help="Análisis IA PRO (Estructura + Documentación).")
 ):
     """
-    🕵️ ESCÁNER: Analiza código.
-    Comportamiento:
-    - Si no usas banderas, dibuja el diagrama por defecto.
-    - Si usas --explain o --ai, NO dibuja el diagrama (a menos que añadas --graph).
+    🕵️ ESCÁNER CONTEXTUAL: Analiza código y documentación.
     """
-    # 1. Escaneo
     scanner = ProjectScanner()
+    
+    if graph:
+        typer.secho(f"🔍 Escaneando '{path}' (Depth: {depth})...", fg=typer.colors.YELLOW)
+    
     flow_string = scanner.scan(path, max_depth=depth)
     
     if not flow_string:
         typer.secho("❌ No se encontraron archivos.", fg=typer.colors.RED)
         return
 
-    # LÓGICA DE VISUALIZACIÓN INTELIGENTE
-    # Si no pidió explicaciones ni IA, asumimos que quiere ver el dibujo (comportamiento default)
-    show_diagram = graph or (not explain and not ai)
-
-    # 2. Dibujo
-    if show_diagram:
-        typer.secho(f"🔍 Escaneando '{path}' (Depth: {depth})...", fg=typer.colors.YELLOW)
+    # 1. DIBUJO
+    if graph:
         router = Router(use_neural_engine=False) 
         router.process(flow_string)
 
-    # 3. Reportes
-    if explain or ai:
-        narrator = Narrator()
+    narrator = Narrator()
+
+    # 2. EXPLICACIÓN LOCAL (Solo topología)
+    if explain:
+        typer.secho("\n📄 REPORTE ESTRUCTURAL:", fg=typer.colors.CYAN, bold=True)
+        print(narrator.explain(flow_string, use_ai=False))
+
+    # 3. INTELIGENCIA ARTIFICIAL (Contexto Completo)
+    if ai:
+        typer.secho("\n🤖 RECOPILANDO CONTEXTO PARA IA...", fg=typer.colors.MAGENTA)
         
-        if explain:
-            typer.secho("\n📄 REPORTE LOCAL:", fg=typer.colors.CYAN, bold=True)
-            print(narrator.explain(flow_string, use_ai=False))
-            
-        if ai:
-            typer.secho("\n🤖 ANÁLISIS IA (n8n):", fg=typer.colors.MAGENTA, bold=True)
-            print(narrator.explain(flow_string, use_ai=True))
+        # A. Generamos el reporte de texto estructurado (más útil que el grafo crudo)
+        text_report = narrator.explain(flow_string, use_ai=False)
+        
+        # B. Leemos README, ROADMAP, etc.
+        docs_content = scanner.get_docs_content(path)
+        
+        # C. Preparamos el Mega-Prompt OPTIMIZADO (Texto procesado + Docs)
+        full_context_payload = (
+            f"ANÁLISIS ESTRUCTURAL DEL PROYECTO:\n{text_report}\n\n"
+            f"DOCUMENTACIÓN ENCONTRADA:\n{docs_content}"
+        )
+        
+        typer.secho("🚀 ENVIANDO A n8n (GEMINI)...", fg=typer.colors.MAGENTA, bold=True)
+        print(narrator.explain(full_context_payload, use_ai=True))
 
 if __name__ == "__main__":
     app()

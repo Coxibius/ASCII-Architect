@@ -75,16 +75,34 @@ class ProjectScanner:
             if str(rel_path) == ".": folder_name = "ROOT"
 
             for file in files:
+                # 🐍 PYTHON
                 if file.endswith(".py"):
                     full_path = Path(root_dir) / file
                     deps = self._find_imports(full_path)
                     if deps:
-                        for dep in deps:
-                            connections.append(f"{file} -> {dep}.py")
+                        for dep in deps: connections.append(f"{file} -> {dep}.py")
                     else:
                         connections.append(f"{folder_name} [DIR] -> {file}")
                 
-                elif file.endswith((".sql", ".md", ".txt")):
+                # 🐳 DOCKER
+                elif file == "Dockerfile":
+                    # El Dockerfile construye la App
+                    connections.append(f"{folder_name} [DIR] -> Dockerfile")
+                elif file == "docker-compose.yml":
+                    # El compose orquesta todo
+                    connections.append(f"docker-compose.yml -> {folder_name} [App]")
+
+                # 🦀 RUST / JS / GO / ETC
+                elif file in ["Cargo.toml", "package.json", "go.mod", "pom.xml"]:
+                    # Archivos de definición de proyecto = Nodos Centrales
+                    connections.append(f"{folder_name} [DIR] -> {file}")
+
+                # ☁️ INFRAESTRUCTURA
+                elif file.endswith(".tf"): # Terraform
+                    connections.append(f"Terraform -> {file}")
+
+                # 🗄️ DATOS (Archivos estáticos)
+                elif file.endswith((".sql", ".db", ".sqlite")):
                     connections.append(f"{folder_name} [DIR] -> {file}")
 
         if not connections: return ""
@@ -122,3 +140,41 @@ class ProjectScanner:
                         pass # Si falla leer uno, seguimos
         
         return "\n".join(docs_buffer)
+
+
+
+def scan(self, root_path: str, max_depth: int = 1) -> str:
+        # ... (código de inicio igual) ...
+
+            for file in files:
+                # 🐍 PYTHON
+                if file.endswith(".py"):
+                    full_path = Path(root_dir) / file
+                    deps = self._find_imports(full_path)
+                    if deps:
+                        for dep in deps: connections.append(f"{file} -> {dep}.py")
+                    else:
+                        connections.append(f"{folder_name} [DIR] -> {file}")
+                
+                # 🐳 DOCKER
+                elif file == "Dockerfile":
+                    # El Dockerfile construye la App
+                    connections.append(f"{folder_name} [DIR] -> Dockerfile")
+                elif file == "docker-compose.yml":
+                    # El compose orquesta todo
+                    connections.append(f"docker-compose.yml -> {folder_name} [App]")
+
+                # 🦀 RUST / JS / GO / ETC
+                elif file in ["Cargo.toml", "package.json", "go.mod", "pom.xml"]:
+                    # Archivos de definición de proyecto = Nodos Centrales
+                    connections.append(f"{folder_name} [DIR] -> {file}")
+
+                # ☁️ INFRAESTRUCTURA
+                elif file.endswith(".tf"): # Terraform
+                    connections.append(f"Terraform -> {file}")
+
+                # 🗄️ DATOS (Archivos estáticos)
+                elif file.endswith((".sql", ".db", ".sqlite")):
+                    connections.append(f"{folder_name} [DIR] -> {file}")
+
+        # ... (retorno igual) ...

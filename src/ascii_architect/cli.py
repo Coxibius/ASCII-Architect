@@ -29,15 +29,16 @@ def scan(
     depth: int = typer.Option(1, "--depth", "-d", help="Profundidad de escaneo."),
     graph: bool = typer.Option(True, "--graph/--no-graph", help="Mostrar dibujo ASCII."),
     explain: bool = typer.Option(False, "--explain", "-e", help="Reporte de texto local."),
-    ai: bool = typer.Option(False, "--ai", help="Análisis IA PRO (Estructura + Documentación).")
+    ai: bool = typer.Option(False, "--ai", help="Análisis IA (n8n)."),
+    style: str = typer.Option("pro", "--style", "-s", help="Personalidad: pro, hacker, soviet, ramsay, jarvis, eli5, doom.")
 ):
     """
-    🕵️ ESCÁNER CONTEXTUAL: Analiza código y documentación.
+    🕵️ ESCÁNER CONTEXTUAL con Personalidad.
     """
     scanner = ProjectScanner()
     
     if graph:
-        typer.secho(f"🔍 Escaneando '{path}' (Depth: {depth})...", fg=typer.colors.YELLOW)
+        typer.secho(f"🔍 Escaneando '{path}'...", fg=typer.colors.YELLOW)
     
     flow_string = scanner.scan(path, max_depth=depth)
     
@@ -52,29 +53,69 @@ def scan(
 
     narrator = Narrator()
 
-    # 2. EXPLICACIÓN LOCAL (Solo topología)
+    # 2. LOCAL
     if explain:
-        typer.secho("\n📄 REPORTE ESTRUCTURAL:", fg=typer.colors.CYAN, bold=True)
+        typer.secho("\n📄 REPORTE LOCAL:", fg=typer.colors.CYAN, bold=True)
         print(narrator.explain(flow_string, use_ai=False))
 
-    # 3. INTELIGENCIA ARTIFICIAL (Contexto Completo)
+    # 3. IA CON PERSONALIDAD
     if ai:
-        typer.secho("\n🤖 RECOPILANDO CONTEXTO PARA IA...", fg=typer.colors.MAGENTA)
+        # Recuperamos contexto (Docs) si quieres enviarlos también
+        # docs = scanner.get_docs_content(path) 
+        # flow_string = flow_string + "\n" + docs 
         
-        # A. Generamos el reporte de texto estructurado (más útil que el grafo crudo)
-        text_report = narrator.explain(flow_string, use_ai=False)
+        typer.secho(f"\n🤖 ANÁLISIS IA (Estilo: {style.upper()}):", fg=typer.colors.MAGENTA, bold=True)
+        print(narrator.explain(flow_string, use_ai=True, style=style))
+
+if __name__ == "__main__":
+    app()
+
+
+# ... imports ...
+
+@app.command()
+def scan(
+    path: str = typer.Argument(".", help="Ruta a analizar"),
+    depth: int = typer.Option(1, "--depth", "-d", help="Profundidad de escaneo."),
+    graph: bool = typer.Option(True, "--graph/--no-graph", help="Mostrar dibujo ASCII."),
+    explain: bool = typer.Option(False, "--explain", "-e", help="Reporte de texto local."),
+    ai: bool = typer.Option(False, "--ai", help="Análisis IA (n8n)."),
+    style: str = typer.Option("pro", "--style", "-s", help="Personalidad: pro, hacker, soviet, ramsay, jarvis, eli5, doom.")
+):
+    """
+    🕵️ ESCÁNER CONTEXTUAL con Personalidad.
+    """
+    scanner = ProjectScanner()
+    
+    if graph:
+        typer.secho(f"🔍 Escaneando '{path}'...", fg=typer.colors.YELLOW)
+    
+    flow_string = scanner.scan(path, max_depth=depth)
+    
+    if not flow_string:
+        typer.secho("❌ No se encontraron archivos.", fg=typer.colors.RED)
+        return
+
+    # 1. DIBUJO
+    if graph:
+        router = Router(use_neural_engine=False) 
+        router.process(flow_string)
+
+    narrator = Narrator()
+
+    # 2. LOCAL
+    if explain:
+        typer.secho("\n📄 REPORTE LOCAL:", fg=typer.colors.CYAN, bold=True)
+        print(narrator.explain(flow_string, use_ai=False))
+
+    # 3. IA CON PERSONALIDAD
+    if ai:
+        # Recuperamos contexto (Docs) si quieres enviarlos también
+        # docs = scanner.get_docs_content(path) 
+        # flow_string = flow_string + "\n" + docs 
         
-        # B. Leemos README, ROADMAP, etc.
-        docs_content = scanner.get_docs_content(path)
-        
-        # C. Preparamos el Mega-Prompt OPTIMIZADO (Texto procesado + Docs)
-        full_context_payload = (
-            f"ANÁLISIS ESTRUCTURAL DEL PROYECTO:\n{text_report}\n\n"
-            f"DOCUMENTACIÓN ENCONTRADA:\n{docs_content}"
-        )
-        
-        typer.secho("🚀 ENVIANDO A n8n (GEMINI)...", fg=typer.colors.MAGENTA, bold=True)
-        print(narrator.explain(full_context_payload, use_ai=True))
+        typer.secho(f"\n🤖 ANÁLISIS IA (Estilo: {style.upper()}):", fg=typer.colors.MAGENTA, bold=True)
+        print(narrator.explain(flow_string, use_ai=True, style=style))
 
 if __name__ == "__main__":
     app()
